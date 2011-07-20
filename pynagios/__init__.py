@@ -4,6 +4,7 @@ with Python. The package file itself exports the constants used
 throughout the library.
 """
 
+from plugin import Plugin
 from status import Status
 
 __version__ = '0.1.0'
