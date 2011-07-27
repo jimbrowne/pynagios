@@ -111,17 +111,17 @@ class TestPerfData(object):
         value.
         """
         instance = PerfData("foo", "7")
-        assert "foo=7" == str(instance)
+        assert "foo=7;;;;" == str(instance)
 
     def test_quote_label(self):
         """
         Tests to verify that the label is quoted if it needs to be.
         """
         instance = PerfData("with=", "7")
-        assert "'with='=7" == str(instance)
+        assert "'with='=7;;;;" == str(instance)
 
         instance = PerfData("I have spaces", "7")
-        assert "'I have spaces'=7" == str(instance)
+        assert "'I have spaces'=7;;;;" == str(instance)
 
         instance = PerfData("quote'", "7")
-        assert "'quote'''=7" == str(instance)
+        assert "'quote'''=7;;;;" == str(instance)

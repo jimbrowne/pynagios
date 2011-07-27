@@ -99,7 +99,15 @@ class PerfData(object):
         # Quotify the label
         label = self._quote_if_needed(self.label)
 
-        return "%s=%s" % (label, self.value)
+        # Check for None in each and make it empty string if so
+        uom = self.uom or ''
+        warn = self.warn or ''
+        crit = self.crit or ''
+        minval = self.minval or ''
+        maxval = self.maxval or ''
+
+        # Create the proper format and return it
+        return "%s=%s%s;%s;%s;%s;%s" % (label, self.value, uom, warn, crit, minval, maxval)
 
     def _is_valid_value(self, value):
         """
