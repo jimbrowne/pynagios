@@ -50,7 +50,7 @@ class Range(object):
 
         # Parse the end value, which can be positive infinity.
         try:
-            if parts[1] == '~':
+            if parts[1] == '' or parts[1] == '~':
                 end = float("inf")
             else:
                 end = float(parts[1])

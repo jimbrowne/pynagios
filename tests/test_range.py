@@ -36,6 +36,14 @@ class TestRangeParsing(object):
         with pytest.raises(RangeValueError):
             Range('10:bad')
 
+    def test_range_with_only_beginning(self):
+        """
+        Tests ranges with only a beginning are parsed properly.
+        """
+        instance = Range('10:')
+        assert 10.0 == instance.start
+        assert float("inf") == instance.end
+
     def test_range_with_only_end(self):
         """
         Tests ranges with only an end value, such as '10'
@@ -158,6 +166,6 @@ class TestRangeChecking(object):
         Tests that the range can be converted back to a valid string
         format.
         """
-        tests = ["10:20", "20", "~:10", "@10:15", "@~:~"]
+        tests = ["10:20", "20", "~:10", "@10:15", "@~:~", "10:~"]
         for test in tests:
             assert test == str(Range(test))
