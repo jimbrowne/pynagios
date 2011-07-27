@@ -56,6 +56,7 @@ class Plugin(object):
     hostname = make_option("-H", "--hostname", dest="hostname")
     warning = make_option("-w", "--warning", dest="warning", type="pynagios_range")
     critical = make_option("-c", "--critical", dest="critical", type="pynagios_range")
+    timeout = make_option("-t", "--timeout", dest="timeout", type="int")
 
     def __init__(self, args):
         # Parse the given arguments to set the options

@@ -30,3 +30,11 @@ class TestPlugin(object):
         """
         plugin = Plugin(["-c", "10:20"])
         assert isinstance(plugin.options.critical, Range)
+
+    def test_plugin_parses_timeout(self):
+        """
+        Tests that plugins can properly parse timeout
+        from the command line via the "-t" option.
+        """
+        plugin = Plugin(["-t", "17"])
+        assert 17 == plugin.options.timeout
