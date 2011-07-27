@@ -57,10 +57,8 @@ class Plugin(object):
     warning = make_option("-w", "--warning", dest="warning", type="pynagios_range")
     critical = make_option("-c", "--critical", dest="critical", type="pynagios_range")
     timeout = make_option("-t", "--timeout", dest="timeout", type="int")
+    verbosity = make_option("-v", "--verbose", dest="verbosity", action="count")
 
     def __init__(self, args):
         # Parse the given arguments to set the options
-        (options, args) = self._option_parser.parse_args(args)
-
-        self.options = options
-        self.args = args
+        (self.options, self.args) = self._option_parser.parse_args(args)

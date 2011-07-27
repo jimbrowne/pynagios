@@ -38,3 +38,16 @@ class TestPlugin(object):
         """
         plugin = Plugin(["-t", "17"])
         assert 17 == plugin.options.timeout
+
+    def test_plugin_parses_verbosity(self):
+        """
+        Tests that plugins can properly parse verbosity.
+        """
+        plugin = Plugin(["-v"])
+        assert 1 == plugin.options.verbosity
+
+        plugin = Plugin(["-vv"])
+        assert 2 == plugin.options.verbosity
+
+        plugin = Plugin(["-vvv"])
+        assert 3 == plugin.options.verbosity
