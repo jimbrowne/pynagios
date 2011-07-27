@@ -25,29 +25,38 @@ The core features supported by PyNagios:
 
 ## Example
 
-What all these nice features result in is a concise, simple, and
+What all these features result in is a concise, simple, and
 guidelines-compliant Python-based Nagios plugin:
 
 ```python
-from pynagios import Plugin
+from pynagios import Plugin, Response
+
+class UserCheck(Plugin):
+    """
+    Nagios plugin to check how many users are logged into this
+    machine.
+    """
+
+    def check(self):
+        # Get the number of logged in users, for now we hardcode
+        users = 27
+
+        # Get the status code for the current number of users
+        # given the warning/critical ranges given.
+        status = self.status_for_value(users)
+
+        # Build a response and exit
+        response = Response(status, "%d users" % users)
+        response.add_perf_data("users", users)
+        response.add_perf_data("another metric", 27, "MB")
+        return response
 
 if __name__ == 'main':
-    # Pretend you got this from some outside source.
-    users = 27
-
-    # Create an instance of the plugin and parse the command line
-    # arguments.
-    plugin = Plugin()
-    plugin.parse_command_line()
-
-    # Add some performance data.
-    plugin.add_perf_data("users", users)
-    plugin.add_perf_data("memory", 814, "MB")
-
-    # This will get the status for the value given the ranges
-    # for warning and critical given by command line arguments
-    status = plugin.status_for_value(users)
-
-    # Exit with the status and message.
-    plugin.exit(status, "system has %d users logged in" % users)
+    # Build the plugin instance and run it. This will also parse
+    # command line arguments by default.
+    UserCheck().check().exit()
 ```
+
+While the above example subclasses `Plugin`, you're of course welcome
+to simply call `Plugin`s methods directly and build a `Response`
+yourself.
