@@ -5,12 +5,13 @@ Contains tests to test the Plugin class.
 from pynagios import Plugin, Range
 
 class TestPlugin(object):
+    Klass = Plugin
 
     def test_plugin_parses_hostname(self):
         """
         Tests that plugins properly parse the hostname option.
         """
-        plugin = Plugin(["-H", "foo.com"])
+        plugin = self.Klass(["-H", "foo.com"])
         assert "foo.com" == plugin.options.hostname
 
     def test_plugin_parses_warning_range(self):
@@ -18,7 +19,7 @@ class TestPlugin(object):
         Tests that plugins can properly parse warning ranges from
         the command line via the "-w" option.
         """
-        plugin = Plugin(["-w", "10:20"])
+        plugin = self.Klass(["-w", "10:20"])
         assert isinstance(plugin.options.warning, Range)
         assert 10.0 == plugin.options.warning.start
         assert 20.0 == plugin.options.warning.end
@@ -28,7 +29,7 @@ class TestPlugin(object):
         Tests that plugins can properly parse critical ranges
         from the command line via the "-c" option.
         """
-        plugin = Plugin(["-c", "10:20"])
+        plugin = self.Klass(["-c", "10:20"])
         assert isinstance(plugin.options.critical, Range)
 
     def test_plugin_parses_timeout(self):
@@ -36,18 +37,18 @@ class TestPlugin(object):
         Tests that plugins can properly parse timeout
         from the command line via the "-t" option.
         """
-        plugin = Plugin(["-t", "17"])
+        plugin = self.Klass(["-t", "17"])
         assert 17 == plugin.options.timeout
 
     def test_plugin_parses_verbosity(self):
         """
         Tests that plugins can properly parse verbosity.
         """
-        plugin = Plugin(["-v"])
+        plugin = self.Klass(["-v"])
         assert 1 == plugin.options.verbosity
 
-        plugin = Plugin(["-vv"])
+        plugin = self.Klass(["-vv"])
         assert 2 == plugin.options.verbosity
 
-        plugin = Plugin(["-vvv"])
+        plugin = self.Klass(["-vvv"])
         assert 3 == plugin.options.verbosity

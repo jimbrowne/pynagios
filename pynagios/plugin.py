@@ -59,6 +59,8 @@ class Plugin(object):
     timeout = make_option("-t", "--timeout", dest="timeout", type="int")
     verbosity = make_option("-v", "--verbose", dest="verbosity", action="count")
 
+    # TODO: Still missing version
+
     def __init__(self, args):
         # Parse the given arguments to set the options
         (self.options, self.args) = self._option_parser.parse_args(args)
