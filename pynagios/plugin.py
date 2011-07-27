@@ -6,6 +6,15 @@ class which encapsulates a single plugin.
 from copy import copy
 from optparse import Option, OptionParser, make_option
 from range import Range, RangeValueError
+from response import Response
+from status import Status
+
+# Status constants which contain both the status text and the
+# exit status associated with them.
+OK = Status("OK", 0)
+WARNING = Status("WARN", 1)
+CRITICAL = Status("CRIT", 2)
+UNKNOWN = Status("UNKNOWN", 3)
 
 def check_pynagios_range(option, opt, value):
     """
@@ -71,3 +80,17 @@ class Plugin(object):
         a proper Response object.
         """
         raise NotImplementedError("This method must be implemented by the plugin.")
+
+    def response_for_value(self, value):
+        """
+        This method returns a new Response object for the given value. The
+        Response will have a proper status depending on the range of this
+        value.
+        """
+        status = OK
+        if self.options.critical.in_range(value):
+            status = CRITICAL
+        elif self.options.warning.in_range(value):
+            status = WARNING
+
+        return Response(status)

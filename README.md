@@ -47,8 +47,8 @@ class UserCheck(Plugin):
 
         # Build a response and exit
         response = Response(status, "%d users" % users)
-        response.add_perf_data("users", users)
-        response.add_perf_data("another metric", 27, "MB")
+        response.set_perf_data("users", users)
+        response.set_perf_data("another metric", 27, "MB")
         return response
 
 if __name__ == 'main':

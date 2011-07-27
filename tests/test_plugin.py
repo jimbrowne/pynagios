@@ -3,6 +3,7 @@ Contains tests to test the Plugin class.
 """
 
 import pytest
+import pynagios
 from pynagios import Plugin, Range
 
 class TestPlugin(object):
@@ -61,3 +62,13 @@ class TestPlugin(object):
         """
         with pytest.raises(NotImplementedError):
             Plugin([]).check()
+
+    def test_plugin_can_return_response_for_value(self):
+        """
+        Tests that the plugin can return a proper response for the given
+        value.
+        """
+        plugin = self.Klass(["-w", "10:20", "-c", "0:40"])
+        assert pynagios.OK == plugin.response_for_value(15).status
+        assert pynagios.WARNING == plugin.response_for_value(27).status
+        assert pynagios.CRITICAL == plugin.response_for_value(50).status
