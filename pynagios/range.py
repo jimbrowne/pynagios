@@ -3,7 +3,7 @@ Contains a class to represent a range that adheres to the range
 format defined by Nagios.
 """
 
-class RangeValueError(Exception):
+class RangeValueError(ValueError):
     pass
 
 class Range(object):

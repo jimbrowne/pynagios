@@ -2,6 +2,7 @@
 Contains tests to test the Plugin class.
 """
 
+import pytest
 from pynagios import Plugin, Range
 
 class TestPlugin(object):
@@ -52,3 +53,11 @@ class TestPlugin(object):
 
         plugin = self.Klass(["-vvv"])
         assert 3 == plugin.options.verbosity
+
+    def test_plugin_errors_on_check(self):
+        """
+        Tests that the base plugin throws an exception for check
+        since it is not implemented.
+        """
+        with pytest.raises(NotImplementedError):
+            Plugin([]).check()

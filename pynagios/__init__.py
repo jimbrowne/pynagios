@@ -6,6 +6,7 @@ throughout the library.
 
 from plugin import Plugin
 from range import Range
+from response import Response
 from status import Status
 
 __version__ = '0.1.0'

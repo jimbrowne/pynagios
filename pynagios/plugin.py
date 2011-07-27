@@ -64,3 +64,10 @@ class Plugin(object):
     def __init__(self, args):
         # Parse the given arguments to set the options
         (self.options, self.args) = self._option_parser.parse_args(args)
+
+    def check(self):
+        """
+        This method is what should be called to run this plugin and return
+        a proper Response object.
+        """
+        raise NotImplementedError("This method must be implemented by the plugin.")
