@@ -37,12 +37,22 @@ class Response(object):
 
         TODO
         """
-        pass
+        # Just set the perf data on the dictionary. PerfData handles
+        # argument validation.
+        self.perf_data[label] = PerfData(label, value, uom=uom, warn=warn,
+                                         crit=crit, minval=minval,
+                                         maxval=maxval)
 
     def __str__(self):
         """
         The string format of this object is the valid Nagios output
         format.
         """
-        basic = "%s: %s" % (self.status.name, self.message)
-        return basic
+        result = "%s: %s" % (self.status.name, self.message)
+
+        if len(self.perf_data) > 0:
+            # Attach the performance data to the result
+            data = [str(val) for key,val in self.perf_data.iteritems()]
+            result += '|%s' % (' '.join(data))
+
+        return result

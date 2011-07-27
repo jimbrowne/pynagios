@@ -115,7 +115,7 @@ class PerfData(object):
         format which certain values for the performance data must adhere to.
         """
         value_format = re.compile(r"[-0-9.]+$")
-        return value is None or value_format.match(value)
+        return value is None or value_format.match(str(value))
 
     def _quote_if_needed(self, value):
         """

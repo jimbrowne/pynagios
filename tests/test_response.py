@@ -25,3 +25,14 @@ class TestResponse(object):
         instance = Response(pynagios.OK, message="Hi")
         expected = "%s: %s" % (pynagios.OK.name, "Hi")
         assert expected == str(instance)
+
+    def test_str_has_performance_data(self):
+        """
+        Tests that with performance data, the status output
+        will output the value along with the performance data.
+        """
+        instance = Response(pynagios.OK, message="yo")
+        instance.set_perf_data("users", 20)
+        instance.set_perf_data("foos", 80)
+        expected = '%s: %s|users=20;;;; foos=80;;;;' % (pynagios.OK.name, "yo")
+        assert expected == str(instance)
