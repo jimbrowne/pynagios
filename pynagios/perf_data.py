@@ -85,8 +85,8 @@ class PerfData(object):
 
     @uom.setter
     def uom(self, value):
-        valids = [None, '', 's', '%', 'B', 'KB', 'MB', 'GB', 'TB', 'c']
-        if not value in valids:
+        valids = ['', 's', '%', 'b', 'kb', 'mb', 'gb', 'tb', 'c']
+        if value is not None and not str(value).lower() in valids:
             raise ValueError("uom must be in: %s" % valids)
 
         self._uom = value

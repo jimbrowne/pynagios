@@ -152,3 +152,12 @@ class TestRangeChecking(object):
         """
         instance = Range('10:20')
         assert instance.in_range(21)
+
+    def test_range_as_string(self):
+        """
+        Tests that the range can be converted back to a valid string
+        format.
+        """
+        tests = ["10:20", "20", "~:10", "@10:15", "@~:~"]
+        for test in tests:
+            assert test == str(Range(test))

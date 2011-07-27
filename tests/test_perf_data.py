@@ -125,3 +125,12 @@ class TestPerfData(object):
 
         instance = PerfData("quote'", "7")
         assert "'quote'''=7;;;;" == str(instance)
+
+    def test_include_other_values(self):
+        """
+        Tests to verify that uom, warn, crit, etc. are properly
+        included in the output.
+        """
+        instance = PerfData("foo", "1", uom="b", warn="10:20", crit="20:30",
+                            minval="1", maxval="5")
+        assert "foo=1b;10:20;20:30;1;5" == str(instance)

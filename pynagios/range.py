@@ -72,3 +72,31 @@ class Range(object):
             return value >= self.start and value <= self.end
         else:
             return value < self.start or value > self.end
+
+    def __str__(self):
+        """
+        Turns this range object back into a valid range string which can
+        be passed to another plugin or used for debug output.
+        """
+        result = '@' if self.inclusive else ''
+
+        # Setup some proxy variables since typing `self` all the time is tiring
+        start = self.start
+        end = self.end
+
+        # Only put start in the result if it is not equal to 0, since
+        # it can otherwise be omitted
+        if start == float("-inf"):
+            result += '~:'
+        elif start != 0.0:
+            value = int(start) if start.is_integer() else start
+            result += str(value) + ':'
+
+        # Append the end value next
+        if end == float("inf"):
+            result += '~'
+        else:
+            value = int(end) if end.is_integer() else end
+            result += str(value)
+
+        return result
