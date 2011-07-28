@@ -14,6 +14,35 @@ class PerfData(object):
 
     def __init__(self, label, value, uom=None, warn=None, crit=None,
                  minval=None, maxval=None):
+        """Creates a new object representing a single performance data
+        item for a Nagios response.
+
+        Performance data is extra key/value data that can be returned
+        along with a response. The performance data is not used immediately
+        by Nagios itself, but can be extracted by 3rd party tools and can
+        often be helpful additional information for system administrators
+        to view. The `label` can be any string, but `value` must be a
+        numeric value.
+
+        Raises :class:`ValueError` if any of the parameters are invalid.
+        The exact nature of the error is in the human readable message
+        attribute of the exception.
+
+        :Parameters
+          - `label`: Label for the performance data. This must be a
+             string.
+          - `value`: Value of the data point. This must be a number whose
+             characters are in the class of `[-0-9.]`
+          - `uom` (optional): Unit of measure. This must only be `%`, `s`
+             for seconds, `c` for continous data, or a unit of bit space
+             measurement ('b', 'kb', etc.)
+          - `warn` (optional): Warning range for this metric.
+          - `crit` (optional): Critical range for this metric.
+          - `minval` (optional): Minimum value possible for this metric,
+            if one exists.
+          - `maxval` (optional): Maximum value possible for this metric,
+            if one exists.
+        """
         self.label = label
         self.value = value
         self.uom = uom
@@ -24,6 +53,7 @@ class PerfData(object):
 
     @property
     def value(self):
+        """The value of this metric."""
         return self._value
 
     @value.setter
@@ -37,6 +67,11 @@ class PerfData(object):
 
     @property
     def warn(self):
+        """
+        The warning range of this metric. This return value of this
+        will always be a :class:`Range` object, even if it was set
+        with a string.
+        """
         return self._warn
 
     @warn.setter
@@ -48,6 +83,11 @@ class PerfData(object):
 
     @property
     def crit(self):
+        """
+        The critical range of this metric. This return value of this
+        will always be a :class:`Range` object, even if it was set
+        with a string.
+        """
         return self._crit
 
     @crit.setter
@@ -59,6 +99,11 @@ class PerfData(object):
 
     @property
     def minval(self):
+        """
+        The minimum value possible for this metric. This doesn't make
+        a lot of sense if the `uom` is '%', since that is obviously going
+        to be 0, but this will return whatever was set.
+        """
         return self._minval
 
     @minval.setter
@@ -70,6 +115,11 @@ class PerfData(object):
 
     @property
     def maxval(self):
+        """
+        The maximum value possible for this metric. This doesn't make
+        a lot of sense if the `uom` is '%', since that is obviously going
+        to be 100, but this will return whatever was set.
+        """
         return self._maxval
 
     @maxval.setter
@@ -81,6 +131,9 @@ class PerfData(object):
 
     @property
     def uom(self):
+        """
+        The unit of measure (UOM) for this metric.
+        """
         return self._uom
 
     @uom.setter
@@ -94,7 +147,9 @@ class PerfData(object):
     def __str__(self):
         """
         Returns the proper string format that should be outputted
-        in the plugin response string.
+        in the plugin response string. This format is documented in
+        depth in the Nagios developer guidelines, but in general looks
+        like this:
         """
         # Quotify the label
         label = self._quote_if_needed(self.label)

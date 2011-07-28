@@ -9,4 +9,5 @@ from range import Range
 from response import Response
 from status import Status
 
-__version__ = '0.1.0'
+version = '0.1.0'
+"""Current version of PyNagios"""

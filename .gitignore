@@ -16,3 +16,6 @@ var
 sdist
 develop-eggs
 .installed.cfg
+
+# Documentation
+docs/_build/
