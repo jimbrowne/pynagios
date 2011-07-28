@@ -29,7 +29,7 @@ What all these features result in is a concise, simple, and
 guidelines-compliant Python-based Nagios plugin:
 
 ```python
-from pynagios import Plugin, Response
+from pynagios import Plugin
 
 class UserCheck(Plugin):
     """
