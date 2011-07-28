@@ -160,6 +160,7 @@ We'll extend our example to add an option to multiply the value by the
 given option value:::
 
     import pynagios
+    from pynagios import make_option
 
     class MyCheck(pynagios.Plugin):
         multiply_by = make_option("--multiply-by", type="int")
