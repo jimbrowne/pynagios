@@ -21,9 +21,17 @@ class PyTest(Command):
         errno = subprocess.call([sys.executable, 'test.py'])
         raise SystemExit(errno)
 
+# Get the long description by reading the README
+try:
+    readme_content = open("README.rst").read()
+except:
+    readme_content = ""
+
+# Create the actual setup method
 setup(name='pynagios',
       version='0.1.0',
       description='Python library to write Nagios plugins.',
+      long_description=readme_content,
       author='Mitchell Hashimoto',
       author_email='mitchell@kiip.me',
       maintainer='Mitchell Hashimoto',
