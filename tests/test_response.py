@@ -19,6 +19,15 @@ class TestResponse(object):
         instance = Response(message="Hello!")
         assert "Hello!" == instance.message
 
+    def test_str_has_blank_message(self):
+        """
+        Tests that a response with no message given will not include
+        anything in the output.
+        """
+        instance = Response(pynagios.OK)
+        expected = "%s:" % pynagios.OK.name
+        assert expected == str(instance)
+
     def test_str_has_status_and_message(self):
         """
         Tests that without performance data, the status output

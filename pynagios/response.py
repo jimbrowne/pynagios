@@ -72,7 +72,10 @@ class Response(object):
 
           OK: 27 users logged in|users=27;0:40;0:60;0;
         """
-        result = "%s: %s" % (self.status.name, self.message)
+        result = "%s:" % self.status.name
+
+        if self.message is not None:
+            result += " %s" % self.message
 
         if len(self.perf_data) > 0:
             # Attach the performance data to the result
