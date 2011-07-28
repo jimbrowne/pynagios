@@ -19,12 +19,12 @@ Features
 
 The core features supported by PyNagios:
 
-  - Parsing command line arguments such that the standard expected
-    arguments (such as ``-H``, ``-w``, ``-c``) are accepted.
-  - Returning proper POSIX exit code based on status.
-  - Parsing Nagios range formats (such as "@10:20", "~:50", "10", etc.)
-  - Outputting status and message.
-  - Outputting performance data.
+- Parsing command line arguments such that the standard expected
+  arguments (such as ``-H``, ``-w``, ``-c``) are accepted.
+- Returning proper POSIX exit code based on status.
+- Parsing Nagios range formats (such as "@10:20", "~:50", "10", etc.)
+- Outputting status and message.
+- Outputting performance data.
 
 Example
 =======
