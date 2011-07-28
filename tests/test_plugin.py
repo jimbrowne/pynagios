@@ -86,3 +86,11 @@ class TestPlugin(object):
         assert pynagios.OK == plugin.response_for_value(15).status
         assert pynagios.WARNING == plugin.response_for_value(27).status
         assert pynagios.CRITICAL == plugin.response_for_value(50).status
+
+    def test_plugin_can_set_message_on_response_for_value(self):
+        """
+        Tests that plugins can set a message when getting a response for
+        a given value.
+        """
+        plugin = self.Klass(["-w", "10:20", "-c", "0:40"])
+        assert "foo!" == plugin.response_for_value(15, "foo!").message

@@ -119,13 +119,17 @@ class Plugin(object):
         """
         raise NotImplementedError("This method must be implemented by the plugin.")
 
-    def response_for_value(self, value):
+    def response_for_value(self, value, message=None):
         """
         This method is meant to be used by plugin implementers to return a
         valid :py:class:`~pynagios.response.Response` object for the given value.
         The status of this response is determined based on the warning and
         critical ranges given via the command line, which the plugin automatically
         parses.
+
+        An optional ``message`` argument may be provided to set the message
+        for the Response object. Note that this can easily be added later as well
+        by simply setting the message attribute on the response object returned.
 
         Creating a response using this method from :py:func:`check` makes it
         trivial to calculate the value, grab a response, set some performance
@@ -137,4 +141,4 @@ class Plugin(object):
         elif self.options.warning.in_range(value):
             status = WARNING
 
-        return Response(status)
+        return Response(status, message=message)
