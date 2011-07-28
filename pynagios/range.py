@@ -4,6 +4,11 @@ format defined by Nagios.
 """
 
 class RangeValueError(ValueError):
+    """
+    This exception is raised when an invalid value is passed to
+    :py:class:`Range`. The message of this exception will contain a
+    human readable explanation of the error.
+    """
     pass
 
 class Range(object):
@@ -21,6 +26,28 @@ class Range(object):
     """
 
     def __init__(self, value):
+        """
+        Initializes a Nagios range with the given value. The value should be
+        in the Nagios range format, which is the following:
+
+        ::
+
+          [@]start:end
+
+        Notes:
+
+          - ``start`` must be less than or equal to ``end``
+          - Ranges by default are exclusive. A range of ``10:20`` will match values
+            that are ``< 10 OR >20``.
+          - ``@`` means the range is `inclusive`. So ``@10:20`` is valid in the
+            case that the value is ``>= 10 AND <= 20``.
+          - If ``start`` or ``end`` is ``~``, this value is negative or positive
+            inifinity, respectively. A range of ``~:20`` will match values that
+            are ``> 20`` only.
+          - If ``start`` is not given, then it is assumed to be 0.
+          - If ``end`` is not given, but a ``:`` exists, then ``end`` is assumed
+            to be infinity. Example: ``5:`` would match ``< 5``.
+        """
         # Clean up the value by clearing whitespace. Also note that an empty
         # value is invalid.
         value = value.strip()
@@ -66,7 +93,7 @@ class Range(object):
 
     def in_range(self, value):
         """
-        Tests whether a value is in this range.
+        Tests whether ``value`` is in this range.
         """
         if self.inclusive:
             return value >= self.start and value <= self.end
@@ -76,7 +103,18 @@ class Range(object):
     def __str__(self):
         """
         Turns this range object back into a valid range string which can
-        be passed to another plugin or used for debug output.
+        be passed to another plugin or used for debug output. The string returned
+        from here should generally be equivalent to the value given to the
+        constructor, but sometimes it can be slightly different. However,
+        it will always be functionally equivalent.
+
+        Examples:
+
+        ::
+
+          >> str(Range("@10:20")) == "@10:20"
+          >> str(Range("10")) == "~:10"
+          >> str(Range("10:")) == "10:~"
         """
         result = '@' if self.inclusive else ''
 

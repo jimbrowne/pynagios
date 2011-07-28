@@ -10,6 +10,13 @@ class Status(object):
     """
 
     def __init__(self, name, exit_code):
+        """
+        Creates a new status object for Nagios with the given name and
+        exit code.
+
+        **Note**: In general, this should never be called since the standard
+        statuses are exported from ``pynagios``.
+        """
         self.name = name
         self.exit_code = exit_code
 

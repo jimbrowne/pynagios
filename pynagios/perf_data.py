@@ -1,5 +1,8 @@
 """
-Contains class to represent performance data for Nagios output.
+Tools for creating performance data for Nagios plugin responses.
+If you're adding performance data to a :py:class:`~pynagios.response.Response`
+object, then :py:func:`~pynagios.response.Response.set_perf_data` can be
+called instead of having to create an entire :py:class:`PerfData` object.
 """
 
 import re
@@ -28,14 +31,14 @@ class PerfData(object):
         The exact nature of the error is in the human readable message
         attribute of the exception.
 
-        :Parameters
+        :Parameters:
           - `label`: Label for the performance data. This must be a
-             string.
+            string.
           - `value`: Value of the data point. This must be a number whose
-             characters are in the class of `[-0-9.]`
+            characters are in the class of `[-0-9.]`
           - `uom` (optional): Unit of measure. This must only be `%`, `s`
-             for seconds, `c` for continous data, or a unit of bit space
-             measurement ('b', 'kb', etc.)
+            for seconds, `c` for continous data, or a unit of bit space
+            measurement ('b', 'kb', etc.)
           - `warn` (optional): Warning range for this metric.
           - `crit` (optional): Critical range for this metric.
           - `minval` (optional): Minimum value possible for this metric,
@@ -69,8 +72,8 @@ class PerfData(object):
     def warn(self):
         """
         The warning range of this metric. This return value of this
-        will always be a :class:`Range` object, even if it was set
-        with a string.
+        will always be a :py:class:`~pynagios.range.Range` object, even
+        if it was set with a string.
         """
         return self._warn
 
@@ -85,8 +88,8 @@ class PerfData(object):
     def crit(self):
         """
         The critical range of this metric. This return value of this
-        will always be a :class:`Range` object, even if it was set
-        with a string.
+        will always be a :py:class:`~pynagios.range.Range` object,
+        even if it was set with a string.
         """
         return self._crit
 
@@ -150,6 +153,9 @@ class PerfData(object):
         in the plugin response string. This format is documented in
         depth in the Nagios developer guidelines, but in general looks
         like this:
+
+            | 'label'=value[UOM];[warn];[crit];[min];[max]
+
         """
         # Quotify the label
         label = self._quote_if_needed(self.label)
