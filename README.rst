@@ -8,14 +8,20 @@ to adhere to, and PyNagios provides helpers to make this
 easy.
 
 Install
-=======
+-------
 
 To install, simply use ``pip`` or ``easy_install``::
 
     pip install pynagios
 
+Documentation
+-------------
+
+Documentation for the latest version can always be found at
+`http://kiip.github.com/pynagios/latest <http://kiip.github.com/pynagios/latest>`_.
+
 Features
-========
+--------
 
 The core features supported by PyNagios:
 
@@ -27,7 +33,7 @@ The core features supported by PyNagios:
 - Outputting performance data.
 
 Example
-=======
+-------
 
 What all these features result in is a concise, simple, and
 guidelines-compliant Python-based Nagios plugin::
