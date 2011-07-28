@@ -10,7 +10,7 @@ Prerequisites
 Before beginning, make sure that **PyNagios** is :doc:`installed <installation>`.
 To verify this, the following should run without raising an exception::
 
-    >>> import pymongo
+    >>> import pynagios
 
 Since Nagios plug-ins are simply executable applications, Nagios itself is not
 required to develop plug-ins.
@@ -171,7 +171,7 @@ given option value:::
             value = 27
 
             # Multiply the value if we were given the flag
-            if options.multiply_by:
+            if self.options.multiply_by:
                 value = value * options.multiply_by
 
             return self.response_for_value(value, str(value))
