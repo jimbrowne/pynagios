@@ -30,8 +30,9 @@ and return a :py:class:`~pynagios.response.Response` object.
 Here is a basic Nagios script::
 
     import pynagios
+    from pynagios import Plugin, Response
 
-    class MyCheck(pynagios.Plugin):
+    class MyCheck(Plugin):
         def check(self):
             return Response(pynagios.OK, "Everything is ok!")
 
@@ -66,8 +67,9 @@ Let's enhance our check to use a value, and return a proper response status
 for that value::
 
     import pynagios
+    from pynagios import Plugin
 
-    class MyCheck(pynagios.Plugin):
+    class MyCheck(Plugin):
         def check(self):
             # Static for this example, but imagine in a real world plugin
             # that this would be calculated.

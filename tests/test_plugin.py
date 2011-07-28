@@ -5,10 +5,30 @@ Contains tests to test the Plugin class.
 import sys
 import pytest
 import pynagios
-from pynagios import Plugin, Range
+from optparse import OptionConflictError
+from pynagios import Plugin, Range, make_option
 
 class TestPlugin(object):
     Klass = Plugin
+
+    def test_child_plugin_inherits_parent_options(self):
+        """
+        Tests that subclasses of Plugin inherit the options from
+        the parent class.
+        """
+        class MyChild(Plugin):
+            pass
+
+        plugin = MyChild(["-H", "foo.com"])
+        assert "foo.com" == plugin.options.hostname
+
+    def test_conflicting_options_explode(self):
+        """
+        Tests that conflicting options will raise an exception.
+        """
+        with pytest.raises(OptionConflictError):
+            class MyChild(Plugin):
+                explode = make_option("-H", type="string")
 
     def test_plugin_parses_sys_argv(self, monkeypatch):
         """

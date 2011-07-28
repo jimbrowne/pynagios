@@ -56,7 +56,14 @@ class PluginMeta(type):
                 options.append(val)
                 del attrs[key]
 
-        # Create the option parser
+        # Need to iterate through the bases in order to extract the
+        # list of parent options, so we can inherit those.
+        for base in bases:
+            if hasattr(base, "_options"):
+                options.extend(getattr(base, "_options"))
+
+        # Store the option list and create the option parser
+        attrs["_options"] = options
         attrs["_option_parser"] = OptionParser(option_list=options)
 
         # Create the class
