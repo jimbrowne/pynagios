@@ -28,6 +28,16 @@ setup(name='pynagios',
       author_email='mitchell@kiip.me',
       maintainer='Mitchell Hashimoto',
       maintainer_email='mitchell@kiip.me',
+      url="https://kiip.github.com/pynagios/",
+      license="MIT License",
+      keywords=["nagios", "pynagios", "monitoring"],
       packages=['pynagios'],
-      cmdclass= { 'test': PyTest }
+      cmdclass= { 'test': PyTest },
+      classifiers=[
+        "Development Status :: 4 - Beta",
+        "Intended Audience :: System Administrators",
+        "License :: OSI Approved :: MIT License",
+        "Operating System :: OS Independent",
+        "Programming Language :: Python",
+        "Topic :: System :: Systems Administration"]
       )
