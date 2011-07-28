@@ -1,0 +1,174 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>response - Response Class &mdash; PyNagios v0.1.0 documentation</title>
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="PyNagios v0.1.0 documentation" href="../../index.html" />
+    <link rel="up" title="pynagios – Python Library for Writing Nagios Plugins" href="index.html" />
+    <link rel="next" title="range - Tools for Working with Nagios Ranges" href="range.html" />
+    <link rel="prev" title="plugin – Plugin Class" href="plugin.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="range.html" title="range - Tools for Working with Nagios Ranges"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="plugin.html" title="plugin – Plugin Class"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../../index.html">PyNagios v0.1.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >API Documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U"><tt class="docutils literal docutils literal docutils literal docutils literal docutils literal docutils literal docutils literal"><span class="pre">pynagios</span></tt> &#8211; Python Library for Writing Nagios Plugins</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-pynagios.response">
+<span id="response-response-class"></span><h1><tt class="xref py py-mod docutils literal"><span class="pre">response</span></tt> - Response Class<a class="headerlink" href="#module-pynagios.response" title="Permalink to this headline">¶</a></h1>
+<p>Contains the class which represents a response for Nagios. This
+encapsulates the response format that Nagios expects.</p>
+<dl class="class">
+<dt id="pynagios.response.Response">
+<em class="property">class </em><tt class="descclassname">pynagios.response.</tt><tt class="descname">Response</tt><big>(</big><span class="optional">[</span><em>status=None</em><span class="optional">[</span>, <em>message=None</em><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="reference internal" href="../../_modules/pynagios/response.html#Response"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pynagios.response.Response" title="Permalink to this definition">¶</a></dt>
+<dd><p>Nagios responses are expected to be in a very specific format, and
+this class allows these responses to easily be built up and extracted
+in the proper format.</p>
+<p>This class makes it easy to set the status, message, and performance
+data for a response.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters :</th><td class="field-body"><ul class="first last simple">
+<li><cite>status</cite> (optional): A <a class="reference internal" href="status.html#pynagios.status.Status" title="pynagios.status.Status"><tt class="xref py py-class docutils literal"><span class="pre">Status</span></tt></a> object
+representing the status of the response.</li>
+<li><cite>message</cite> (optional): An information message to include with the
+output.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="pynagios.response.Response.set_perf_data">
+<tt class="descname">set_perf_data</tt><big>(</big><em>label</em>, <em>value</em>, <em>uom=None</em>, <em>warn=None</em>, <em>crit=None</em>, <em>minval=None</em>, <em>maxval=None</em><big>)</big><a class="reference internal" href="../../_modules/pynagios/response.html#Response.set_perf_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pynagios.response.Response.set_perf_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds performance data to the response. Performance data is shown
+in the Nagios GUI and can be used by 3rd party programs to build
+graphs or other informational output. There are many options to this
+method. They are the same as the initialization parameters for a
+<a class="reference internal" href="perf_data.html#pynagios.perf_data.PerfData" title="pynagios.perf_data.PerfData"><tt class="xref py py-class docutils literal"><span class="pre">PerfData</span></tt></a> object.</p>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="perf_data.html#pynagios.perf_data.PerfData" title="pynagios.perf_data.PerfData"><tt class="xref py py-class docutils literal"><span class="pre">PerfData</span></tt></a></p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="pynagios.response.Response.exit">
+<tt class="descname">exit</tt><big>(</big><big>)</big><a class="reference internal" href="../../_modules/pynagios/response.html#Response.exit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pynagios.response.Response.exit" title="Permalink to this definition">¶</a></dt>
+<dd><p>This prints out the response to <tt class="docutils literal"><span class="pre">stdout</span></tt> and exits with the
+proper exit code.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pynagios.response.Response.__str__">
+<tt class="descname">__str__</tt><big>(</big><big>)</big><a class="reference internal" href="../../_modules/pynagios/response.html#Response.__str__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pynagios.response.Response.__str__" title="Permalink to this definition">¶</a></dt>
+<dd><p>The string format of this object is the valid Nagios output
+format. The response format is expected to be the following:</p>
+<div class="highlight-python"><pre>status: information|performance data</pre>
+</div>
+<p>An example of realistic output:</p>
+<div class="highlight-python"><pre>OK: 27 users logged in|users=27;0:40;0:60;0;</pre>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="plugin.html"
+                        title="previous chapter"><tt class="docutils literal docutils literal docutils literal"><span class="pre">plugin</span></tt> &#8211; Plugin Class</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="range.html"
+                        title="next chapter"><tt class="docutils literal docutils literal"><span class="pre">range</span></tt> - Tools for Working with Nagios Ranges</a></p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="range.html" title="range - Tools for Working with Nagios Ranges"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="plugin.html" title="plugin – Plugin Class"
+             >previous</a> |</li>
+        <li><a href="../../index.html">PyNagios v0.1.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >API Documentation</a> &raquo;</li>
+          <li><a href="index.html" ><tt class="docutils literal docutils literal docutils literal docutils literal docutils literal docutils literal docutils literal"><span class="pre">pynagios</span></tt> &#8211; Python Library for Writing Nagios Plugins</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, Mitchell Hashimoto.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
+    </div>
+  </body>
+</html>

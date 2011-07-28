@@ -1,0 +1,263 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Tutorial &mdash; PyNagios v0.1.0 documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="PyNagios v0.1.0 documentation" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="index.html">PyNagios v0.1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="tutorial">
+<h1>Tutorial<a class="headerlink" href="#tutorial" title="Permalink to this headline">¶</a></h1>
+<p>This tutorial will provide an introduction and examples for writing
+Nagios plugins using <strong>PyNagios</strong>.</p>
+<div class="section" id="prerequisites">
+<h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Permalink to this headline">¶</a></h2>
+<p>Before beginning, make sure that <strong>PyNagios</strong> is <tt class="xref doc docutils literal"><span class="pre">installed</span></tt>.
+To verify this, the following should run without raising an exception:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pynagios</span>
+</pre></div>
+</div>
+<p>Since Nagios plug-ins are simply executable applications, Nagios itself is not
+required to develop plug-ins.</p>
+</div>
+<div class="section" id="a-simple-plugin">
+<h2>A Simple Plugin<a class="headerlink" href="#a-simple-plugin" title="Permalink to this headline">¶</a></h2>
+<p>All plugins must inherit from the <a class="reference internal" href="api/pynagios/plugin.html#pynagios.plugin.Plugin" title="pynagios.plugin.Plugin"><tt class="xref py py-class docutils literal"><span class="pre">Plugin</span></tt></a> class.
+Nagios plug-ins are expected to conform to a standard set of command line
+arguments (in addition to any custom arguments that may be added), and the
+PyNagios Plugin class already knows how to read and process these arguments.</p>
+<p>After inheriting from the class, <a class="reference internal" href="api/pynagios/plugin.html#pynagios.plugin.Plugin.check" title="pynagios.plugin.Plugin.check"><tt class="xref py py-func docutils literal"><span class="pre">check()</span></tt></a>
+should be implemented, which should perform whatever check the plugin does,
+and return a <a class="reference internal" href="api/pynagios/response.html#pynagios.response.Response" title="pynagios.response.Response"><tt class="xref py py-class docutils literal"><span class="pre">Response</span></tt></a> object.</p>
+<p>Here is a basic Nagios script:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">pynagios</span>
+<span class="kn">from</span> <span class="nn">pynagios</span> <span class="kn">import</span> <span class="n">Plugin</span><span class="p">,</span> <span class="n">Response</span>
+
+<span class="k">class</span> <span class="nc">MyCheck</span><span class="p">(</span><span class="n">Plugin</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">check</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">Response</span><span class="p">(</span><span class="n">pynagios</span><span class="o">.</span><span class="n">OK</span><span class="p">,</span> <span class="s">&quot;Everything is ok!&quot;</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="c"># Instantiate the plugin, check it, and then exit</span>
+    <span class="n">MyCheck</span><span class="p">()</span><span class="o">.</span><span class="n">check</span><span class="p">()</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Save this to a Python file and run it, and you should see the following
+output:</p>
+<div class="highlight-python"><pre>$ python my_check.py
+OK: Everything is ok!</pre>
+</div>
+<p>And the exit status will be <tt class="docutils literal"><span class="pre">0</span></tt>, meaning everything is good.</p>
+<p>This is the most basic Nagios plug-in that can be created. Now, let&#8217;s
+create one that is more feature-complete.</p>
+</div>
+<div class="section" id="returning-proper-responses">
+<h2>Returning Proper Responses<a class="headerlink" href="#returning-proper-responses" title="Permalink to this headline">¶</a></h2>
+<p>In the first example, we simply returned <tt class="docutils literal"><span class="pre">pynagios.OK</span></tt> on every
+check. Realistically, we would get a value and return <tt class="docutils literal"><span class="pre">OK</span></tt>, <tt class="docutils literal"><span class="pre">WARNING</span></tt>,
+or <tt class="docutils literal"><span class="pre">CRITICAL</span></tt> depending on that value. According to the Nagios developer
+guidelines, the warning and critical ranges must be able to be set via
+the command line via <tt class="docutils literal"><span class="pre">-w</span></tt> and <tt class="docutils literal"><span class="pre">-c</span></tt>, respectively. <strong>PyNagios</strong> plugins
+do this for you automatically, as we shall see in this section.</p>
+<p>Let&#8217;s enhance our check to use a value, and return a proper response status
+for that value:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">pynagios</span>
+<span class="kn">from</span> <span class="nn">pynagios</span> <span class="kn">import</span> <span class="n">Plugin</span>
+
+<span class="k">class</span> <span class="nc">MyCheck</span><span class="p">(</span><span class="n">Plugin</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">check</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c"># Static for this example, but imagine in a real world plugin</span>
+        <span class="c"># that this would be calculated.</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="mi">27</span>
+
+        <span class="c"># Return a response for that value</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">response_for_value</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This check now has some numeric value which we&#8217;ve set to a static <tt class="docutils literal"><span class="pre">27</span></tt>
+for the purpose of this example. The important piece is that the plugin
+calls <a class="reference internal" href="api/pynagios/plugin.html#pynagios.plugin.Plugin.response_for_value" title="pynagios.plugin.Plugin.response_for_value"><tt class="xref py py-func docutils literal"><span class="pre">response_for_value()</span></tt></a> to generate
+a response based on that value. This method takes into account the warning
+and critical ranges set by the plugin and the command line.</p>
+<p>Since we didn&#8217;t set any defaults for the warning and critical range,
+we&#8217;ll find that the check will be <tt class="docutils literal"><span class="pre">OK</span></tt> by default:</p>
+<div class="highlight-python"><pre>$ python my_check.py
+OK:</pre>
+</div>
+<p>By introducing some ranges, we can see that the plugin automatically
+works. In this case, 27 is outside of the warning range, but still not
+critical. The plugin properly returns <tt class="docutils literal"><span class="pre">WARN</span></tt>:</p>
+<div class="highlight-python"><pre>$ python my_check.py -w 10:20 -c 0:30
+WARN:</pre>
+</div>
+<p>And again, if we modify the ranges slightly, we can get the plugin to
+consider the value critical:</p>
+<div class="highlight-python"><pre>$ python my_check.py -w 5:10 -c 0:20
+CRIT:</pre>
+</div>
+<p><strong>Note on ranges:</strong> If you&#8217;re unfamiliar with Nagios ranges, it may not be
+clear how exactly they&#8217;re working. Ranges default to exclusive, meaning
+a range of <tt class="docutils literal"><span class="pre">10:20</span></tt> means that a value is included in this range if the
+value is <tt class="docutils literal"><span class="pre">&lt;</span> <span class="pre">10</span> <span class="pre">OR</span> <span class="pre">&gt;</span> <span class="pre">20</span></tt>. For more details on Nagios range format, it is
+fully documented in the <a class="reference internal" href="api/pynagios/range.html#pynagios.range.Range" title="pynagios.range.Range"><tt class="xref py py-class docutils literal"><span class="pre">Range</span></tt></a> documentation.</p>
+</div>
+<div class="section" id="adding-performance-data">
+<h2>Adding Performance Data<a class="headerlink" href="#adding-performance-data" title="Permalink to this headline">¶</a></h2>
+<p>Nagios plug-ins can also output metrics which are useful for 3rd party
+applications and can also be read on the Nagios dashboard. <strong>PyNagios</strong>
+provides an easy way to add performance data to responses. Extending our
+example once again:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">pynagios</span>
+<span class="kn">from</span> <span class="nn">pynagios</span> <span class="kn">import</span> <span class="n">Plugin</span>
+
+<span class="k">class</span> <span class="nc">MyCheck</span><span class="p">(</span><span class="n">Plugin</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">check</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c"># Static for this example, but imagine in a real world plugin</span>
+        <span class="c"># that this would be calculated.</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="mi">27</span>
+
+        <span class="c"># Return a response for that value</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">response_for_value</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="n">result</span><span class="o">.</span><span class="n">set_perf_data</span><span class="p">(</span><span class="s">&quot;some_key&quot;</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+        <span class="n">result</span><span class="o">.</span><span class="n">set_perf_data</span><span class="p">(</span><span class="s">&quot;zero&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">result</span>
+</pre></div>
+</div>
+<p>The <a class="reference internal" href="api/pynagios/response.html#pynagios.response.Response.set_perf_data" title="pynagios.response.Response.set_perf_data"><tt class="xref py py-func docutils literal"><span class="pre">set_perf_data()</span></tt></a> function can be used
+to set performance data on the response. If we run the check now, we should
+see output similar to the following:</p>
+<div class="highlight-python"><pre>$ python my_check.py
+OK:|some_key=27;;;; zero=0;;;;</pre>
+</div>
+<p>Note that the extra semicolons are in order to comply with the standard
+performance data format and can contain additional information. See
+<a class="reference internal" href="api/pynagios/perf_data.html#pynagios.perf_data.PerfData" title="pynagios.perf_data.PerfData"><tt class="xref py py-class docutils literal"><span class="pre">PerfData</span></tt></a> for more information.</p>
+</div>
+<div class="section" id="custom-command-line-options-and-arguments">
+<h2>Custom Command-line Options and Arguments<a class="headerlink" href="#custom-command-line-options-and-arguments" title="Permalink to this headline">¶</a></h2>
+<p>Often checks can require additional command line options. Since <strong>PyNagios</strong>
+plugins parse the command line on their own, you should define additional
+options on the plugin itself, rather than attempting to use your own command
+line parser. <strong>PyNagios</strong> uses Python&#8217;s built-in <tt class="docutils literal"><span class="pre">optparse</span></tt> library.</p>
+<p>We&#8217;ll extend our example to add an option to multiply the value by the
+given option value::</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">pynagios</span>
+<span class="kn">from</span> <span class="nn">pynagios</span> <span class="kn">import</span> <span class="n">Plugin</span><span class="p">,</span> <span class="n">make_option</span>
+
+<span class="k">class</span> <span class="nc">MyCheck</span><span class="p">(</span><span class="n">Plugin</span><span class="p">):</span>
+    <span class="n">multiply_by</span> <span class="o">=</span> <span class="n">make_option</span><span class="p">(</span><span class="s">&quot;--multiply-by&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s">&quot;int&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">check</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c"># Static for this example, but imagine in a real world plugin</span>
+        <span class="c"># that this would be calculated.</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="mi">27</span>
+
+        <span class="c"># Multiply the value if we were given the flag</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">multiply_by</span><span class="p">:</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="n">value</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">multiply_by</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">response_for_value</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>We&#8217;ve added the option <tt class="docutils literal"><span class="pre">multiply_by</span></tt>. If we run the check without the
+option, we see the normal output:</p>
+<div class="highlight-python"><pre>$ python my_check.py
+OK: 27</pre>
+</div>
+<p>But by adding a number to multiply by, we&#8217;ll get different output:</p>
+<div class="highlight-python"><pre>$ python my_check.py --multiply-by 10
+OK: 270</pre>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Tutorial</a><ul>
+<li><a class="reference internal" href="#prerequisites">Prerequisites</a></li>
+<li><a class="reference internal" href="#a-simple-plugin">A Simple Plugin</a></li>
+<li><a class="reference internal" href="#returning-proper-responses">Returning Proper Responses</a></li>
+<li><a class="reference internal" href="#adding-performance-data">Adding Performance Data</a></li>
+<li><a class="reference internal" href="#custom-command-line-options-and-arguments">Custom Command-line Options and Arguments</a></li>
+</ul>
+</li>
+</ul>
+
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="index.html">PyNagios v0.1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, Mitchell Hashimoto.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
+    </div>
+  </body>
+</html>

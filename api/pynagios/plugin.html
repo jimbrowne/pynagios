@@ -1,0 +1,198 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>plugin – Plugin Class &mdash; PyNagios v0.1.0 documentation</title>
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="PyNagios v0.1.0 documentation" href="../../index.html" />
+    <link rel="up" title="pynagios – Python Library for Writing Nagios Plugins" href="index.html" />
+    <link rel="next" title="response - Response Class" href="response.html" />
+    <link rel="prev" title="perf_data – Performance Data Classes" href="perf_data.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="response.html" title="response - Response Class"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="perf_data.html" title="perf_data – Performance Data Classes"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../../index.html">PyNagios v0.1.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >API Documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U"><tt class="docutils literal docutils literal docutils literal docutils literal docutils literal"><span class="pre">pynagios</span></tt> &#8211; Python Library for Writing Nagios Plugins</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-pynagios.plugin">
+<span id="plugin-plugin-class"></span><h1><tt class="xref py py-mod docutils literal"><span class="pre">plugin</span></tt> &#8211; Plugin Class<a class="headerlink" href="#module-pynagios.plugin" title="Permalink to this headline">¶</a></h1>
+<p>This module provides the Plugin class, which is the basic
+class which encapsulates a single plugin. This is the class
+which should be subclassed when creating new plugins.</p>
+<dl class="class">
+<dt id="pynagios.plugin.Plugin">
+<em class="property">class </em><tt class="descclassname">pynagios.plugin.</tt><tt class="descname">Plugin</tt><big>(</big><span class="optional">[</span><em>argv=sys.argv</em><span class="optional">]</span><big>)</big><a class="reference internal" href="../../_modules/pynagios/plugin.html#Plugin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pynagios.plugin.Plugin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Instantiates a plugin, setting up the options and arguments state.
+Initialization by itself shouldn&#8217;t do much, since the plugin should run
+when <a class="reference internal" href="#pynagios.plugin.Plugin.check" title="pynagios.plugin.Plugin.check"><tt class="xref py py-func docutils literal"><span class="pre">check()</span></tt></a> is called.</p>
+<p>This init method will parse the arguments given in <tt class="docutils literal"><span class="pre">args</span></tt> and will
+set the results on the <tt class="docutils literal"><span class="pre">options</span></tt> attribute. If no <tt class="docutils literal"><span class="pre">args</span></tt> are given,
+the command line arguments given to the whole Python application will
+be used.</p>
+<p>All plugins parse standard command line arguments that are required
+by the Nagios developer guidelines:</p>
+<blockquote>
+<div><ul class="simple">
+<li><tt class="docutils literal"><span class="pre">hostname</span></tt> - Set via <tt class="docutils literal"><span class="pre">-H</span></tt> or <tt class="docutils literal"><span class="pre">--hostname</span></tt>, this should be the
+host that this check targets, if applicable.</li>
+<li><tt class="docutils literal"><span class="pre">warning</span></tt> - Set via <tt class="docutils literal"><span class="pre">-w</span></tt> or <tt class="docutils literal"><span class="pre">--warning</span></tt>, this should be a valid
+range in which the value of the plugin is considered to be a warning.</li>
+<li><tt class="docutils literal"><span class="pre">critical</span></tt> - Set via <tt class="docutils literal"><span class="pre">-c</span></tt> or <tt class="docutils literal"><span class="pre">--critical</span></tt>, this should be a
+valid range in which the value is considered to be critical.</li>
+<li><tt class="docutils literal"><span class="pre">timeout</span></tt> - Set via <tt class="docutils literal"><span class="pre">-t</span></tt> or <tt class="docutils literal"><span class="pre">--timeout</span></tt>, this is an int value
+for the timeout of this check.</li>
+<li><tt class="docutils literal"><span class="pre">verbosity</span></tt> - Set via <tt class="docutils literal"><span class="pre">-v</span></tt>, where additional <tt class="docutils literal"><span class="pre">v</span></tt> means more
+verbosity. Example: <tt class="docutils literal"><span class="pre">-vvv</span></tt> will set <tt class="docutils literal"><span class="pre">options.verbosity</span></tt> to 3.</li>
+</ul>
+</div></blockquote>
+<p>Subclasses can define additional options by creating <tt class="docutils literal"><span class="pre">Option</span></tt> instances
+and assigning them to class attributes. The easiest way to make an
+<tt class="docutils literal"><span class="pre">Option</span></tt> is to use Python&#8217;s built-in <tt class="docutils literal"><span class="pre">optparse</span></tt> methods. The following
+is an example plugin which adds a simple string argument::</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">MyPlugin</span><span class="p">(</span><span class="n">Plugin</span><span class="p">):</span>
+    <span class="n">your_name</span> <span class="o">=</span> <span class="n">make_option</span><span class="p">(</span><span class="s">&quot;--your-name&quot;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s">&quot;your_name&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s">&quot;string&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Instantiating the above plugin will result in the value of the new
+argument being available in <tt class="docutils literal"><span class="pre">options.your_name</span></tt>.</p>
+<dl class="attribute">
+<dt id="pynagios.plugin.Plugin.options">
+<tt class="descname">options</tt><a class="headerlink" href="#pynagios.plugin.Plugin.options" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dictionary of parsed command line options and their values. As an
+example, to get the <tt class="docutils literal"><span class="pre">hostname</span></tt> passed in via the command line::</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">options</span><span class="o">.</span><span class="n">hostname</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pynagios.plugin.Plugin.args">
+<tt class="descname">args</tt><a class="headerlink" href="#pynagios.plugin.Plugin.args" title="Permalink to this definition">¶</a></dt>
+<dd><p>Array of additional positional arguments passed in via the command
+line. For example, if you call the plugin with <tt class="docutils literal"><span class="pre">./plugin</span> <span class="pre">1</span> <span class="pre">2</span> <span class="pre">3</span></tt>,
+then <tt class="docutils literal"><span class="pre">options.args</span></tt> will return <tt class="docutils literal"><span class="pre">[1,2,3]</span></tt>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pynagios.plugin.Plugin.check">
+<tt class="descname">check</tt><big>(</big><big>)</big><a class="reference internal" href="../../_modules/pynagios/plugin.html#Plugin.check"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pynagios.plugin.Plugin.check" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method is what should be called to run this plugin and return
+a proper <a class="reference internal" href="response.html#pynagios.response.Response" title="pynagios.response.Response"><tt class="xref py py-class docutils literal"><span class="pre">Response</span></tt></a> object. Subclasses
+are expected to implement this.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pynagios.plugin.Plugin.response_for_value">
+<tt class="descname">response_for_value</tt><big>(</big><em>value</em>, <em>message=None</em><big>)</big><a class="reference internal" href="../../_modules/pynagios/plugin.html#Plugin.response_for_value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pynagios.plugin.Plugin.response_for_value" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method is meant to be used by plugin implementers to return a
+valid <a class="reference internal" href="response.html#pynagios.response.Response" title="pynagios.response.Response"><tt class="xref py py-class docutils literal"><span class="pre">Response</span></tt></a> object for the given value.
+The status of this response is determined based on the warning and
+critical ranges given via the command line, which the plugin automatically
+parses.</p>
+<p>An optional <tt class="docutils literal"><span class="pre">message</span></tt> argument may be provided to set the message
+for the Response object. Note that this can easily be added later as well
+by simply setting the message attribute on the response object returned.</p>
+<p>Creating a response using this method from <a class="reference internal" href="#pynagios.plugin.Plugin.check" title="pynagios.plugin.Plugin.check"><tt class="xref py py-func docutils literal"><span class="pre">check()</span></tt></a> makes it
+trivial to calculate the value, grab a response, set some performance
+metrics, and return it.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="perf_data.html"
+                        title="previous chapter"><tt class="docutils literal docutils literal docutils literal"><span class="pre">perf_data</span></tt> &#8211; Performance Data Classes</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="response.html"
+                        title="next chapter"><tt class="docutils literal"><span class="pre">response</span></tt> - Response Class</a></p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="response.html" title="response - Response Class"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="perf_data.html" title="perf_data – Performance Data Classes"
+             >previous</a> |</li>
+        <li><a href="../../index.html">PyNagios v0.1.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >API Documentation</a> &raquo;</li>
+          <li><a href="index.html" ><tt class="docutils literal docutils literal docutils literal docutils literal docutils literal"><span class="pre">pynagios</span></tt> &#8211; Python Library for Writing Nagios Plugins</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, Mitchell Hashimoto.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
+    </div>
+  </body>
+</html>

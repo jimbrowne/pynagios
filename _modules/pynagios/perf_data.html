@@ -1,0 +1,285 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pynagios.perf_data &mdash; PyNagios v0.1.0 documentation</title>
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="PyNagios v0.1.0 documentation" href="../../index.html" />
+    <link rel="up" title="pynagios" href="../pynagios.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">PyNagios v0.1.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li>
+          <li><a href="../pynagios.html" accesskey="U">pynagios</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for pynagios.perf_data</h1><div class="highlight"><pre>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Tools for creating performance data for Nagios plugin responses.</span>
+<span class="sd">If you&#39;re adding performance data to a :py:class:`~pynagios.response.Response`</span>
+<span class="sd">object, then :py:func:`~pynagios.response.Response.set_perf_data` can be</span>
+<span class="sd">called instead of having to create an entire :py:class:`PerfData` object.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">from</span> <span class="nn">range</span> <span class="kn">import</span> <span class="n">Range</span>
+
+<div class="viewcode-block" id="PerfData"><a class="viewcode-back" href="../../api/pynagios/perf_data.html#pynagios.perf_data.PerfData">[docs]</a><span class="k">class</span> <span class="nc">PerfData</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class represents performance data for a response. Since</span>
+<span class="sd">    performance data has a non-trivial response format, this class</span>
+<span class="sd">    is meant to ease the formation of performance data.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">uom</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">warn</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">crit</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                 <span class="n">minval</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">maxval</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Creates a new object representing a single performance data</span>
+<span class="sd">        item for a Nagios response.</span>
+
+<span class="sd">        Performance data is extra key/value data that can be returned</span>
+<span class="sd">        along with a response. The performance data is not used immediately</span>
+<span class="sd">        by Nagios itself, but can be extracted by 3rd party tools and can</span>
+<span class="sd">        often be helpful additional information for system administrators</span>
+<span class="sd">        to view. The `label` can be any string, but `value` must be a</span>
+<span class="sd">        numeric value.</span>
+
+<span class="sd">        Raises :class:`ValueError` if any of the parameters are invalid.</span>
+<span class="sd">        The exact nature of the error is in the human readable message</span>
+<span class="sd">        attribute of the exception.</span>
+
+<span class="sd">        :Parameters:</span>
+<span class="sd">          - `label`: Label for the performance data. This must be a</span>
+<span class="sd">            string.</span>
+<span class="sd">          - `value`: Value of the data point. This must be a number whose</span>
+<span class="sd">            characters are in the class of `[-0-9.]`</span>
+<span class="sd">          - `uom` (optional): Unit of measure. This must only be `%`, `s`</span>
+<span class="sd">            for seconds, `c` for continous data, or a unit of bit space</span>
+<span class="sd">            measurement (&#39;b&#39;, &#39;kb&#39;, etc.)</span>
+<span class="sd">          - `warn` (optional): Warning range for this metric.</span>
+<span class="sd">          - `crit` (optional): Critical range for this metric.</span>
+<span class="sd">          - `minval` (optional): Minimum value possible for this metric,</span>
+<span class="sd">            if one exists.</span>
+<span class="sd">          - `maxval` (optional): Maximum value possible for this metric,</span>
+<span class="sd">            if one exists.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="n">label</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">uom</span> <span class="o">=</span> <span class="n">uom</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">warn</span> <span class="o">=</span> <span class="n">warn</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">crit</span> <span class="o">=</span> <span class="n">crit</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">minval</span> <span class="o">=</span> <span class="n">minval</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">maxval</span> <span class="o">=</span> <span class="n">maxval</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">value</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The value of this metric.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_value</span>
+
+    <span class="nd">@value.setter</span>
+<div class="viewcode-block" id="PerfData.value"><a class="viewcode-back" href="../../api/pynagios/perf_data.html#pynagios.perf_data.PerfData.value">[docs]</a>    <span class="k">def</span> <span class="nf">value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;value must not be None&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_valid_value</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;value must be in class [-0-9.]&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_value</span> <span class="o">=</span> <span class="n">value</span>
+</div>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">warn</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The warning range of this metric. This return value of this</span>
+<span class="sd">        will always be a :py:class:`~pynagios.range.Range` object, even</span>
+<span class="sd">        if it was set with a string.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_warn</span>
+
+    <span class="nd">@warn.setter</span>
+<div class="viewcode-block" id="PerfData.warn"><a class="viewcode-back" href="../../api/pynagios/perf_data.html#pynagios.perf_data.PerfData.warn">[docs]</a>    <span class="k">def</span> <span class="nf">warn</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">Range</span><span class="p">):</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="n">Range</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_warn</span> <span class="o">=</span> <span class="n">value</span>
+</div>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">crit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The critical range of this metric. This return value of this</span>
+<span class="sd">        will always be a :py:class:`~pynagios.range.Range` object,</span>
+<span class="sd">        even if it was set with a string.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_crit</span>
+
+    <span class="nd">@crit.setter</span>
+<div class="viewcode-block" id="PerfData.crit"><a class="viewcode-back" href="../../api/pynagios/perf_data.html#pynagios.perf_data.PerfData.crit">[docs]</a>    <span class="k">def</span> <span class="nf">crit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">Range</span><span class="p">):</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="n">Range</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_crit</span> <span class="o">=</span> <span class="n">value</span>
+</div>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">minval</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The minimum value possible for this metric. This doesn&#39;t make</span>
+<span class="sd">        a lot of sense if the `uom` is &#39;%&#39;, since that is obviously going</span>
+<span class="sd">        to be 0, but this will return whatever was set.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_minval</span>
+
+    <span class="nd">@minval.setter</span>
+<div class="viewcode-block" id="PerfData.minval"><a class="viewcode-back" href="../../api/pynagios/perf_data.html#pynagios.perf_data.PerfData.minval">[docs]</a>    <span class="k">def</span> <span class="nf">minval</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_valid_value</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;minval must be in class [-0-9.]&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_minval</span> <span class="o">=</span> <span class="n">value</span>
+</div>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">maxval</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The maximum value possible for this metric. This doesn&#39;t make</span>
+<span class="sd">        a lot of sense if the `uom` is &#39;%&#39;, since that is obviously going</span>
+<span class="sd">        to be 100, but this will return whatever was set.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_maxval</span>
+
+    <span class="nd">@maxval.setter</span>
+<div class="viewcode-block" id="PerfData.maxval"><a class="viewcode-back" href="../../api/pynagios/perf_data.html#pynagios.perf_data.PerfData.maxval">[docs]</a>    <span class="k">def</span> <span class="nf">maxval</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_valid_value</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;maxval must be in class [-0-9.]&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_maxval</span> <span class="o">=</span> <span class="n">value</span>
+</div>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">uom</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The unit of measure (UOM) for this metric.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_uom</span>
+
+    <span class="nd">@uom.setter</span>
+<div class="viewcode-block" id="PerfData.uom"><a class="viewcode-back" href="../../api/pynagios/perf_data.html#pynagios.perf_data.PerfData.uom">[docs]</a>    <span class="k">def</span> <span class="nf">uom</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="n">valids</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;&#39;</span><span class="p">,</span> <span class="s">&#39;s&#39;</span><span class="p">,</span> <span class="s">&#39;%&#39;</span><span class="p">,</span> <span class="s">&#39;b&#39;</span><span class="p">,</span> <span class="s">&#39;kb&#39;</span><span class="p">,</span> <span class="s">&#39;mb&#39;</span><span class="p">,</span> <span class="s">&#39;gb&#39;</span><span class="p">,</span> <span class="s">&#39;tb&#39;</span><span class="p">,</span> <span class="s">&#39;c&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="n">valids</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;uom must be in: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">valids</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_uom</span> <span class="o">=</span> <span class="n">value</span>
+</div>
+<div class="viewcode-block" id="PerfData.__str__"><a class="viewcode-back" href="../../api/pynagios/perf_data.html#pynagios.perf_data.PerfData.__str__">[docs]</a>    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the proper string format that should be outputted</span>
+<span class="sd">        in the plugin response string. This format is documented in</span>
+<span class="sd">        depth in the Nagios developer guidelines, but in general looks</span>
+<span class="sd">        like this:</span>
+
+<span class="sd">            | &#39;label&#39;=value[UOM];[warn];[crit];[min];[max]</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c"># Quotify the label</span>
+        <span class="n">label</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_quote_if_needed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">)</span>
+
+        <span class="c"># Check for None in each and make it empty string if so</span>
+        <span class="n">uom</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">uom</span> <span class="ow">or</span> <span class="s">&#39;&#39;</span>
+        <span class="n">warn</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">warn</span> <span class="ow">or</span> <span class="s">&#39;&#39;</span>
+        <span class="n">crit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">crit</span> <span class="ow">or</span> <span class="s">&#39;&#39;</span>
+        <span class="n">minval</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">minval</span> <span class="ow">or</span> <span class="s">&#39;&#39;</span>
+        <span class="n">maxval</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">maxval</span> <span class="ow">or</span> <span class="s">&#39;&#39;</span>
+
+        <span class="c"># Create the proper format and return it</span>
+        <span class="k">return</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s">=</span><span class="si">%s%s</span><span class="s">;</span><span class="si">%s</span><span class="s">;</span><span class="si">%s</span><span class="s">;</span><span class="si">%s</span><span class="s">;</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">uom</span><span class="p">,</span> <span class="n">warn</span><span class="p">,</span> <span class="n">crit</span><span class="p">,</span> <span class="n">minval</span><span class="p">,</span> <span class="n">maxval</span><span class="p">)</span>
+</div>
+    <span class="k">def</span> <span class="nf">_is_valid_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns boolean noting whether a value is in the proper value</span>
+<span class="sd">        format which certain values for the performance data must adhere to.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">value_format</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s">r&quot;[-0-9.]+$&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">value</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">or</span> <span class="n">value_format</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">_quote_if_needed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This handles single quoting the label if necessary. The reason that</span>
+<span class="sd">        this is not done all the time is so that characters can be saved</span>
+<span class="sd">        since Nagios only reads 80 characters and one line of stdout.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="s">&#39;=&#39;</span> <span class="ow">in</span> <span class="n">value</span> <span class="ow">or</span> <span class="s">&#39; &#39;</span> <span class="ow">in</span> <span class="n">value</span> <span class="ow">or</span> <span class="s">&quot;&#39;&quot;</span> <span class="ow">in</span> <span class="n">value</span><span class="p">:</span>
+            <span class="c"># Quote the string and replace single quotes with double single</span>
+            <span class="c"># quotes and return that</span>
+            <span class="k">return</span> <span class="s">&quot;&#39;</span><span class="si">%s</span><span class="s">&#39;&quot;</span> <span class="o">%</span> <span class="n">value</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&quot;&#39;&quot;</span><span class="p">,</span> <span class="s">&quot;&#39;&#39;&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">value</span>
+</pre></div></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">PyNagios v0.1.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li>
+          <li><a href="../pynagios.html" >pynagios</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, Mitchell Hashimoto.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,216 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>perf_data – Performance Data Classes &mdash; PyNagios v0.1.0 documentation</title>
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="PyNagios v0.1.0 documentation" href="../../index.html" />
+    <link rel="up" title="pynagios – Python Library for Writing Nagios Plugins" href="index.html" />
+    <link rel="next" title="plugin – Plugin Class" href="plugin.html" />
+    <link rel="prev" title="pynagios – Python Library for Writing Nagios Plugins" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="plugin.html" title="plugin – Plugin Class"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="pynagios – Python Library for Writing Nagios Plugins"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../../index.html">PyNagios v0.1.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >API Documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U"><tt class="docutils literal docutils literal docutils literal docutils literal"><span class="pre">pynagios</span></tt> &#8211; Python Library for Writing Nagios Plugins</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-pynagios.perf_data">
+<span id="perf-data-performance-data-classes"></span><h1><tt class="xref py py-mod docutils literal"><span class="pre">perf_data</span></tt> &#8211; Performance Data Classes<a class="headerlink" href="#module-pynagios.perf_data" title="Permalink to this headline">¶</a></h1>
+<p>Tools for creating performance data for Nagios plugin responses.
+If you&#8217;re adding performance data to a <a class="reference internal" href="response.html#pynagios.response.Response" title="pynagios.response.Response"><tt class="xref py py-class docutils literal"><span class="pre">Response</span></tt></a>
+object, then <a class="reference internal" href="response.html#pynagios.response.Response.set_perf_data" title="pynagios.response.Response.set_perf_data"><tt class="xref py py-func docutils literal"><span class="pre">set_perf_data()</span></tt></a> can be
+called instead of having to create an entire <a class="reference internal" href="#pynagios.perf_data.PerfData" title="pynagios.perf_data.PerfData"><tt class="xref py py-class docutils literal"><span class="pre">PerfData</span></tt></a> object.</p>
+<dl class="class">
+<dt id="pynagios.perf_data.PerfData">
+<em class="property">class </em><tt class="descclassname">pynagios.perf_data.</tt><tt class="descname">PerfData</tt><big>(</big><em>label</em>, <em>value</em><span class="optional">[</span>, <em>uom=None</em><span class="optional">[</span>, <em>warn=None</em><span class="optional">[</span>, <em>crit=None</em><span class="optional">[</span>, <em>minval=None</em><span class="optional">[</span>, <em>maxval=None</em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="reference internal" href="../../_modules/pynagios/perf_data.html#PerfData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pynagios.perf_data.PerfData" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a new object representing a single performance data
+item for a Nagios response.</p>
+<p>Performance data is extra key/value data that can be returned
+along with a response. The performance data is not used immediately
+by Nagios itself, but can be extracted by 3rd party tools and can
+often be helpful additional information for system administrators
+to view. The <cite>label</cite> can be any string, but <cite>value</cite> must be a
+numeric value.</p>
+<p>Raises <tt class="xref py py-class docutils literal"><span class="pre">ValueError</span></tt> if any of the parameters are invalid.
+The exact nature of the error is in the human readable message
+attribute of the exception.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters :</th><td class="field-body"><ul class="first last simple">
+<li><cite>label</cite>: Label for the performance data. This must be a
+string.</li>
+<li><cite>value</cite>: Value of the data point. This must be a number whose
+characters are in the class of <cite>[-0-9.]</cite></li>
+<li><cite>uom</cite> (optional): Unit of measure. This must only be <cite>%</cite>, <cite>s</cite>
+for seconds, <cite>c</cite> for continous data, or a unit of bit space
+measurement (&#8216;b&#8217;, &#8216;kb&#8217;, etc.)</li>
+<li><cite>warn</cite> (optional): Warning range for this metric.</li>
+<li><cite>crit</cite> (optional): Critical range for this metric.</li>
+<li><cite>minval</cite> (optional): Minimum value possible for this metric,
+if one exists.</li>
+<li><cite>maxval</cite> (optional): Maximum value possible for this metric,
+if one exists.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="pynagios.perf_data.PerfData.value">
+<tt class="descname">value</tt><a class="reference internal" href="../../_modules/pynagios/perf_data.html#PerfData.value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pynagios.perf_data.PerfData.value" title="Permalink to this definition">¶</a></dt>
+<dd><p>The value of this metric.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pynagios.perf_data.PerfData.warn">
+<tt class="descname">warn</tt><a class="reference internal" href="../../_modules/pynagios/perf_data.html#PerfData.warn"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pynagios.perf_data.PerfData.warn" title="Permalink to this definition">¶</a></dt>
+<dd><p>The warning range of this metric. This return value of this
+will always be a <a class="reference internal" href="range.html#pynagios.range.Range" title="pynagios.range.Range"><tt class="xref py py-class docutils literal"><span class="pre">Range</span></tt></a> object, even
+if it was set with a string.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pynagios.perf_data.PerfData.crit">
+<tt class="descname">crit</tt><a class="reference internal" href="../../_modules/pynagios/perf_data.html#PerfData.crit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pynagios.perf_data.PerfData.crit" title="Permalink to this definition">¶</a></dt>
+<dd><p>The critical range of this metric. This return value of this
+will always be a <a class="reference internal" href="range.html#pynagios.range.Range" title="pynagios.range.Range"><tt class="xref py py-class docutils literal"><span class="pre">Range</span></tt></a> object,
+even if it was set with a string.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pynagios.perf_data.PerfData.minval">
+<tt class="descname">minval</tt><a class="reference internal" href="../../_modules/pynagios/perf_data.html#PerfData.minval"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pynagios.perf_data.PerfData.minval" title="Permalink to this definition">¶</a></dt>
+<dd><p>The minimum value possible for this metric. This doesn&#8217;t make
+a lot of sense if the <cite>uom</cite> is &#8216;%&#8217;, since that is obviously going
+to be 0, but this will return whatever was set.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pynagios.perf_data.PerfData.maxval">
+<tt class="descname">maxval</tt><a class="reference internal" href="../../_modules/pynagios/perf_data.html#PerfData.maxval"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pynagios.perf_data.PerfData.maxval" title="Permalink to this definition">¶</a></dt>
+<dd><p>The maximum value possible for this metric. This doesn&#8217;t make
+a lot of sense if the <cite>uom</cite> is &#8216;%&#8217;, since that is obviously going
+to be 100, but this will return whatever was set.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pynagios.perf_data.PerfData.uom">
+<tt class="descname">uom</tt><a class="reference internal" href="../../_modules/pynagios/perf_data.html#PerfData.uom"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pynagios.perf_data.PerfData.uom" title="Permalink to this definition">¶</a></dt>
+<dd><p>The unit of measure (UOM) for this metric.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pynagios.perf_data.PerfData.__str__">
+<tt class="descname">__str__</tt><big>(</big><big>)</big><a class="reference internal" href="../../_modules/pynagios/perf_data.html#PerfData.__str__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pynagios.perf_data.PerfData.__str__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the proper string format that should be outputted
+in the plugin response string. This format is documented in
+depth in the Nagios developer guidelines, but in general looks
+like this:</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">&#8216;label&#8217;=value[UOM];[warn];[crit];[min];[max]</div>
+</div>
+</div></blockquote>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter"><tt class="docutils literal docutils literal docutils literal"><span class="pre">pynagios</span></tt> &#8211; Python Library for Writing Nagios Plugins</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="plugin.html"
+                        title="next chapter"><tt class="docutils literal"><span class="pre">plugin</span></tt> &#8211; Plugin Class</a></p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="plugin.html" title="plugin – Plugin Class"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="pynagios – Python Library for Writing Nagios Plugins"
+             >previous</a> |</li>
+        <li><a href="../../index.html">PyNagios v0.1.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >API Documentation</a> &raquo;</li>
+          <li><a href="index.html" ><tt class="docutils literal docutils literal docutils literal docutils literal"><span class="pre">pynagios</span></tt> &#8211; Python Library for Writing Nagios Plugins</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, Mitchell Hashimoto.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
+    </div>
+  </body>
+</html>

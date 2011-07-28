@@ -1,0 +1,250 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pynagios.plugin &mdash; PyNagios v0.1.0 documentation</title>
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="PyNagios v0.1.0 documentation" href="../../index.html" />
+    <link rel="up" title="pynagios" href="../pynagios.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">PyNagios v0.1.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li>
+          <li><a href="../pynagios.html" accesskey="U">pynagios</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for pynagios.plugin</h1><div class="highlight"><pre>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module provides the Plugin class, which is the basic</span>
+<span class="sd">class which encapsulates a single plugin. This is the class</span>
+<span class="sd">which should be subclassed when creating new plugins.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">copy</span>
+<span class="kn">from</span> <span class="nn">optparse</span> <span class="kn">import</span> <span class="n">Option</span><span class="p">,</span> <span class="n">OptionParser</span><span class="p">,</span> <span class="n">make_option</span>
+<span class="kn">from</span> <span class="nn">range</span> <span class="kn">import</span> <span class="n">Range</span><span class="p">,</span> <span class="n">RangeValueError</span>
+<span class="kn">from</span> <span class="nn">response</span> <span class="kn">import</span> <span class="n">Response</span>
+<span class="kn">from</span> <span class="nn">status</span> <span class="kn">import</span> <span class="n">Status</span>
+
+<span class="c"># Status constants which contain both the status text and the</span>
+<span class="c"># exit status associated with them.</span>
+<span class="n">OK</span> <span class="o">=</span> <span class="n">Status</span><span class="p">(</span><span class="s">&quot;OK&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="n">WARNING</span> <span class="o">=</span> <span class="n">Status</span><span class="p">(</span><span class="s">&quot;WARN&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">CRITICAL</span> <span class="o">=</span> <span class="n">Status</span><span class="p">(</span><span class="s">&quot;CRIT&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">UNKNOWN</span> <span class="o">=</span> <span class="n">Status</span><span class="p">(</span><span class="s">&quot;UNKNOWN&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">check_pynagios_range</span><span class="p">(</span><span class="n">option</span><span class="p">,</span> <span class="n">opt</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This parses and returns the Nagios range value.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">Range</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">RangeValueError</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">OptionValueError</span><span class="p">(</span><span class="s">&quot;options </span><span class="si">%s</span><span class="s">: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">opt</span><span class="p">,</span> <span class="n">e</span><span class="o">.</span><span class="n">message</span><span class="p">))</span>
+
+<span class="c"># Add the &quot;pynagios_range&quot; type to the global available</span>
+<span class="c"># options for OptionParser</span>
+<span class="n">Option</span><span class="o">.</span><span class="n">TYPES</span> <span class="o">=</span> <span class="n">Option</span><span class="o">.</span><span class="n">TYPES</span> <span class="o">+</span> <span class="p">(</span><span class="s">&quot;pynagios_range&quot;</span><span class="p">,)</span>
+<span class="n">Option</span><span class="o">.</span><span class="n">TYPE_CHECKER</span><span class="p">[</span><span class="s">&quot;pynagios_range&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">check_pynagios_range</span>
+
+<span class="k">class</span> <span class="nc">PluginMeta</span><span class="p">(</span><span class="nb">type</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    We use a metaclass to create the plugins in order to gather and</span>
+<span class="sd">    set up things such as command line arguments.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__new__</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">bases</span><span class="p">,</span> <span class="n">attrs</span><span class="p">):</span>
+        <span class="n">attrs</span> <span class="o">=</span> <span class="n">attrs</span> <span class="k">if</span> <span class="n">attrs</span> <span class="k">else</span> <span class="p">{}</span>
+
+        <span class="c"># Set the options on the plugin by finding all the Options and</span>
+        <span class="c"># setting them. This also removes the original Option attributes.</span>
+        <span class="n">options</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span><span class="n">val</span> <span class="ow">in</span> <span class="n">attrs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">Option</span><span class="p">):</span>
+                <span class="c"># We set the destination of the Option to always be the</span>
+                <span class="c"># attribute key...</span>
+                <span class="n">val</span><span class="o">.</span><span class="n">dest</span> <span class="o">=</span> <span class="n">key</span>
+
+                <span class="c"># Append it to the list of options and delete it from</span>
+                <span class="c"># the original attributes list</span>
+                <span class="n">options</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+                <span class="k">del</span> <span class="n">attrs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+
+        <span class="c"># Need to iterate through the bases in order to extract the</span>
+        <span class="c"># list of parent options, so we can inherit those.</span>
+        <span class="k">for</span> <span class="n">base</span> <span class="ow">in</span> <span class="n">bases</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">base</span><span class="p">,</span> <span class="s">&quot;_options&quot;</span><span class="p">):</span>
+                <span class="n">options</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">base</span><span class="p">,</span> <span class="s">&quot;_options&quot;</span><span class="p">))</span>
+
+        <span class="c"># Store the option list and create the option parser</span>
+        <span class="n">attrs</span><span class="p">[</span><span class="s">&quot;_options&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">options</span>
+        <span class="n">attrs</span><span class="p">[</span><span class="s">&quot;_option_parser&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">OptionParser</span><span class="p">(</span><span class="n">option_list</span><span class="o">=</span><span class="n">options</span><span class="p">)</span>
+
+        <span class="c"># Create the class</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">PluginMeta</span><span class="p">,</span> <span class="n">cls</span><span class="p">)</span><span class="o">.</span><span class="n">__new__</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">bases</span><span class="p">,</span> <span class="n">attrs</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Plugin"><a class="viewcode-back" href="../../api/pynagios/plugin.html#pynagios.plugin.Plugin">[docs]</a><span class="k">class</span> <span class="nc">Plugin</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Encapsulates a single plugin. This is able to parse the command line</span>
+<span class="sd">    arguments, understands the range syntax, provides help output, and</span>
+<span class="sd">    more.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">__metaclass__</span> <span class="o">=</span> <span class="n">PluginMeta</span>
+
+    <span class="n">hostname</span> <span class="o">=</span> <span class="n">make_option</span><span class="p">(</span><span class="s">&quot;-H&quot;</span><span class="p">,</span> <span class="s">&quot;--hostname&quot;</span><span class="p">)</span>
+    <span class="n">warning</span> <span class="o">=</span> <span class="n">make_option</span><span class="p">(</span><span class="s">&quot;-w&quot;</span><span class="p">,</span> <span class="s">&quot;--warning&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s">&quot;pynagios_range&quot;</span><span class="p">)</span>
+    <span class="n">critical</span> <span class="o">=</span> <span class="n">make_option</span><span class="p">(</span><span class="s">&quot;-c&quot;</span><span class="p">,</span> <span class="s">&quot;--critical&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s">&quot;pynagios_range&quot;</span><span class="p">)</span>
+    <span class="n">timeout</span> <span class="o">=</span> <span class="n">make_option</span><span class="p">(</span><span class="s">&quot;-t&quot;</span><span class="p">,</span> <span class="s">&quot;--timeout&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s">&quot;int&quot;</span><span class="p">)</span>
+    <span class="n">verbosity</span> <span class="o">=</span> <span class="n">make_option</span><span class="p">(</span><span class="s">&quot;-v&quot;</span><span class="p">,</span> <span class="s">&quot;--verbose&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s">&quot;count&quot;</span><span class="p">)</span>
+
+    <span class="c"># TODO: Still missing version</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Instantiates a plugin, setting up the options and arguments state.</span>
+<span class="sd">        Initialization by itself shouldn&#39;t do much, since the plugin should run</span>
+<span class="sd">        when :py:func:`check` is called.</span>
+
+<span class="sd">        This init method will parse the arguments given in ``args`` and will</span>
+<span class="sd">        set the results on the ``options`` attribute. If no ``args`` are given,</span>
+<span class="sd">        the command line arguments given to the whole Python application will</span>
+<span class="sd">        be used.</span>
+
+<span class="sd">        All plugins parse standard command line arguments that are required</span>
+<span class="sd">        by the Nagios developer guidelines:</span>
+
+<span class="sd">          - ``hostname`` - Set via ``-H`` or ``--hostname``, this should be the</span>
+<span class="sd">            host that this check targets, if applicable.</span>
+<span class="sd">          - ``warning`` - Set via ``-w`` or ``--warning``, this should be a valid</span>
+<span class="sd">            range in which the value of the plugin is considered to be a warning.</span>
+<span class="sd">          - ``critical`` - Set via ``-c`` or ``--critical``, this should be a</span>
+<span class="sd">            valid range in which the value is considered to be critical.</span>
+<span class="sd">          - ``timeout`` - Set via ``-t`` or ``--timeout``, this is an int value</span>
+<span class="sd">            for the timeout of this check.</span>
+<span class="sd">          - ``verbosity`` - Set via ``-v``, where additional ``v`` means more</span>
+<span class="sd">            verbosity. Example: ``-vvv`` will set ``options.verbosity`` to 3.</span>
+
+<span class="sd">        Subclasses can define additional options by creating ``Option`` instances</span>
+<span class="sd">        and assigning them to class attributes. The easiest way to make an</span>
+<span class="sd">        ``Option`` is to use Python&#39;s built-in ``optparse`` methods. The following</span>
+<span class="sd">        is an example plugin which adds a simple string argument:::</span>
+
+<span class="sd">            class MyPlugin(Plugin):</span>
+<span class="sd">                your_name = make_option(&quot;--your-name&quot;, dest=&quot;your_name&quot;, type=&quot;string&quot;)</span>
+
+<span class="sd">        Instantiating the above plugin will result in the value of the new</span>
+<span class="sd">        argument being available in ``options.your_name``.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c"># Parse the given arguments to set the options</span>
+        <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_option_parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Plugin.check"><a class="viewcode-back" href="../../api/pynagios/plugin.html#pynagios.plugin.Plugin.check">[docs]</a>    <span class="k">def</span> <span class="nf">check</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method is what should be called to run this plugin and return</span>
+<span class="sd">        a proper :py:class:`~pynagios.response.Response` object. Subclasses</span>
+<span class="sd">        are expected to implement this.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;This method must be implemented by the plugin.&quot;</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="Plugin.response_for_value"><a class="viewcode-back" href="../../api/pynagios/plugin.html#pynagios.plugin.Plugin.response_for_value">[docs]</a>    <span class="k">def</span> <span class="nf">response_for_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method is meant to be used by plugin implementers to return a</span>
+<span class="sd">        valid :py:class:`~pynagios.response.Response` object for the given value.</span>
+<span class="sd">        The status of this response is determined based on the warning and</span>
+<span class="sd">        critical ranges given via the command line, which the plugin automatically</span>
+<span class="sd">        parses.</span>
+
+<span class="sd">        An optional ``message`` argument may be provided to set the message</span>
+<span class="sd">        for the Response object. Note that this can easily be added later as well</span>
+<span class="sd">        by simply setting the message attribute on the response object returned.</span>
+
+<span class="sd">        Creating a response using this method from :py:func:`check` makes it</span>
+<span class="sd">        trivial to calculate the value, grab a response, set some performance</span>
+<span class="sd">        metrics, and return it.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">status</span> <span class="o">=</span> <span class="n">OK</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">critical</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">critical</span><span class="o">.</span><span class="n">in_range</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+            <span class="n">status</span> <span class="o">=</span> <span class="n">CRITICAL</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">warning</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">warning</span><span class="o">.</span><span class="n">in_range</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+            <span class="n">status</span> <span class="o">=</span> <span class="n">WARNING</span>
+
+        <span class="k">return</span> <span class="n">Response</span><span class="p">(</span><span class="n">status</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="n">message</span><span class="p">)</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">PyNagios v0.1.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li>
+          <li><a href="../pynagios.html" >pynagios</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, Mitchell Hashimoto.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
+    </div>
+  </body>
+</html>
