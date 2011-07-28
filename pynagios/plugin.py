@@ -47,6 +47,12 @@ class PluginMeta(type):
 
         for key,val in attrs.items():
             if isinstance(val, Option):
+                # We set the destination of the Option to always be the
+                # attribute key...
+                val.dest = key
+
+                # Append it to the list of options and delete it from
+                # the original attributes list
                 options.append(val)
                 del attrs[key]
 
@@ -64,11 +70,11 @@ class Plugin(object):
     """
     __metaclass__ = PluginMeta
 
-    hostname = make_option("-H", "--hostname", dest="hostname")
-    warning = make_option("-w", "--warning", dest="warning", type="pynagios_range")
-    critical = make_option("-c", "--critical", dest="critical", type="pynagios_range")
-    timeout = make_option("-t", "--timeout", dest="timeout", type="int")
-    verbosity = make_option("-v", "--verbose", dest="verbosity", action="count")
+    hostname = make_option("-H", "--hostname")
+    warning = make_option("-w", "--warning", type="pynagios_range")
+    critical = make_option("-c", "--critical", type="pynagios_range")
+    timeout = make_option("-t", "--timeout", type="int")
+    verbosity = make_option("-v", "--verbose", action="count")
 
     # TODO: Still missing version
 
