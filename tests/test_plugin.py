@@ -2,12 +2,26 @@
 Contains tests to test the Plugin class.
 """
 
+import sys
 import pytest
 import pynagios
 from pynagios import Plugin, Range
 
 class TestPlugin(object):
     Klass = Plugin
+
+    def test_plugin_parses_sys_argv(self, monkeypatch):
+        """
+        Tests that plugins by default parse the passed in
+        arguments.
+        """
+        # Update the argv in-place since the default arguments
+        # are evaluated at "compile" time of Python
+        del sys.argv[:]
+        sys.argv.extend(["-H", "foo.com"])
+
+        plugin = self.Klass()
+        assert "foo.com" == plugin.options.hostname
 
     def test_plugin_parses_hostname(self):
         """

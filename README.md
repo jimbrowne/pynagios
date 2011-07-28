@@ -41,12 +41,10 @@ class UserCheck(Plugin):
         # Get the number of logged in users, for now we hardcode
         users = 27
 
-        # Get the status code for the current number of users
-        # given the warning/critical ranges given.
-        status = self.status_for_value(users)
-
-        # Build a response and exit
-        response = Response(status, "%d users" % users)
+        # Build a response and exit. This `response_for_value` automatically
+        # creates a response with the proper status given the value and the
+        # warning/critical ranges passed in via the command line.
+        response = self.response_for_value(users, "%d users" % users)
         response.set_perf_data("users", users)
         response.set_perf_data("another metric", 27, "MB")
         return response

@@ -3,6 +3,7 @@ Contains the class which represents a response for Nagios. This
 encapsulates the response format that Nagios expects.
 """
 
+import sys
 from perf_data import PerfData
 
 class Response(object):
@@ -42,6 +43,14 @@ class Response(object):
         self.perf_data[label] = PerfData(label, value, uom=uom, warn=warn,
                                          crit=crit, minval=minval,
                                          maxval=maxval)
+
+    def exit(self):
+        """
+        This prints out the response and exits with the proper exit
+        code.
+        """
+        print(str(self))
+        sys.exit(self.status.exit_code)
 
     def __str__(self):
         """

@@ -3,6 +3,7 @@ This module provides the Plugin class, which is the basic
 class which encapsulates a single plugin.
 """
 
+import sys
 from copy import copy
 from optparse import Option, OptionParser, make_option
 from range import Range, RangeValueError
@@ -70,7 +71,7 @@ class Plugin(object):
 
     # TODO: Still missing version
 
-    def __init__(self, args):
+    def __init__(self, args=sys.argv):
         # Parse the given arguments to set the options
         (self.options, self.args) = self._option_parser.parse_args(args)
 

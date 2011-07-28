@@ -2,6 +2,8 @@
 Contains tests for the pynagios.Response class.
 """
 
+import cStringIO
+import sys
 import pynagios
 from pynagios import Response
 
@@ -36,3 +38,23 @@ class TestResponse(object):
         instance.set_perf_data("foos", 80)
         expected = '%s: %s|users=20;;;; foos=80;;;;' % (pynagios.OK.name, "yo")
         assert expected == str(instance)
+
+    def test_exit(self, monkeypatch):
+        """
+        Tests that responses exit with the proper exit code and
+        stdout output.
+        """
+        def mock_exit(code):
+            mock_exit.exit_status = code
+
+        mock_exit.exit_status = None
+
+        output = cStringIO.StringIO()
+        monkeypatch.setattr(sys, 'stdout', output)
+        monkeypatch.setattr(sys, 'exit', mock_exit)
+
+        instance = Response(pynagios.OK)
+        instance.exit()
+
+        assert pynagios.OK.exit_code == mock_exit.exit_status
+        assert "%s\n" % str(instance) == output.getvalue()
