@@ -4,6 +4,8 @@ with Python. The package file itself exports the constants used
 throughout the library.
 """
 
+from optparse import make_option
+
 from plugin import Plugin, OK, WARNING, CRITICAL, UNKNOWN
 from range import Range
 from response import Response
