@@ -124,8 +124,9 @@ provides an easy way to add performance data to responses. Extending our
 example once again::
 
     import pynagios
+    from pynagios import Plugin
 
-    class MyCheck(pynagios.Plugin):
+    class MyCheck(Plugin):
         def check(self):
             # Static for this example, but imagine in a real world plugin
             # that this would be calculated.
@@ -144,7 +145,7 @@ see output similar to the following:
 ::
 
     $ python my_check.py
-    OK: |some_key=27;;;; zero=0;;;;
+    OK:|some_key=27;;;; zero=0;;;;
 
 Note that the extra semicolons are in order to comply with the standard
 performance data format and can contain additional information. See
@@ -162,9 +163,9 @@ We'll extend our example to add an option to multiply the value by the
 given option value:::
 
     import pynagios
-    from pynagios import make_option
+    from pynagios import Plugin, make_option
 
-    class MyCheck(pynagios.Plugin):
+    class MyCheck(Plugin):
         multiply_by = make_option("--multiply-by", type="int")
 
         def check(self):
@@ -174,7 +175,7 @@ given option value:::
 
             # Multiply the value if we were given the flag
             if self.options.multiply_by:
-                value = value * options.multiply_by
+                value = value * self.options.multiply_by
 
             return self.response_for_value(value, str(value))
 
