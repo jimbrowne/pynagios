@@ -136,9 +136,9 @@ class Plugin(object):
         metrics, and return it.
         """
         status = OK
-        if self.options.critical.in_range(value):
+        if self.options.critical is not None and self.options.critical.in_range(value):
             status = CRITICAL
-        elif self.options.warning.in_range(value):
+        elif self.options.warning is not None and self.options.warning.in_range(value):
             status = WARNING
 
         return Response(status, message=message)

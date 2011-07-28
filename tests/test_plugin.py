@@ -94,3 +94,11 @@ class TestPlugin(object):
         """
         plugin = self.Klass(["-w", "10:20", "-c", "0:40"])
         assert "foo!" == plugin.response_for_value(15, "foo!").message
+
+    def test_warning_is_optional(self):
+        """
+        Tests that if warning and critical are not set on the command line
+        then the response is OK.
+        """
+        plugin = self.Klass([])
+        assert pynagios.OK == plugin.response_for_value(15).status
