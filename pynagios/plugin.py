@@ -77,7 +77,7 @@ class Plugin(object):
     """
     __metaclass__ = PluginMeta
 
-    hostname = make_option("-H", "--hostname", type="string")
+    hostname = make_option("-H", "--hostname", type="string", default=None)
     warning = make_option("-w", "--warning", type="pynagios_range")
     critical = make_option("-c", "--critical", type="pynagios_range")
     timeout = make_option("-t", "--timeout", type="int", default=0)
