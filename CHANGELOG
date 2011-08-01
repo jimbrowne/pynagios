@@ -1,6 +1,7 @@
 ## 0.1.2 (unreleased)
 
-
+  - Default timeout to None. This allows the plugin to differentiate
+    from a lack of a timeout given to a 0 timeout.
 
 ## 0.1.1 (August 1, 2011)
 
