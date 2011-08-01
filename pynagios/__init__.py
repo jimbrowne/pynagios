@@ -11,5 +11,5 @@ from range import Range
 from response import Response
 from status import Status
 
-version = '0.1.1'
+version = '0.1.2-dev'
 """Current version of PyNagios"""
