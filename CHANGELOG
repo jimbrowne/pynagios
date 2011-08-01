@@ -1,0 +1,8 @@
+## 0.1.1 (August 1, 2011)
+
+  - Default `host` to None
+  - Default `timeout` to 0
+
+## 0.1.0 (July 28, 2011)
+
+  - Initial release
