@@ -173,6 +173,6 @@ class TestRangeChecking(object):
         Tests that the range can be converted back to a valid string
         format.
         """
-        tests = ["10:20", "20", "~:10", "@10:15", "@~:~", "10:~"]
+        tests = ["10", "10:20", "20", "~:10", "@10:15", "@~:~", "10:~"]
         for test in tests:
             assert test == str(Range(test))

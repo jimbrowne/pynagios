@@ -114,7 +114,7 @@ class Range(object):
         ::
 
           >> str(Range("@10:20")) == "@10:20"
-          >> str(Range("10")) == "~:10"
+          >> str(Range("10")) == "10"
           >> str(Range("10:")) == "10:~"
         """
         result = '@' if self.inclusive else ''
