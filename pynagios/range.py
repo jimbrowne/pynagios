@@ -62,6 +62,7 @@ class Range(object):
 
         # Split by the ':' character to get the start/end parts.
         parts = value.split(':')
+        if len(parts) > 2: raise RangeValueError('Range cannot have more than two parts.')
         if len(parts) == 1: parts.insert(0, '0')
 
         # Parse the start value. If no ':' is included in value (e.g. '10')

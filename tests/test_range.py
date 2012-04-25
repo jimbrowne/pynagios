@@ -15,6 +15,13 @@ class TestRangeParsing(object):
         with pytest.raises(RangeValueError):
             Range('')
 
+    def test_range_with_too_many_values(self):
+        """
+        Tests ranges with too many values throws an error.
+        """
+        with pytest.raises(RangeValueError):
+            Range("10:20:30")
+
     def test_range_with_empty_start(self):
         """
         Tests ranges with an empty start value.
