@@ -22,3 +22,6 @@ class Status(object):
 
     def __repr__(self):
         return "Status(name=%s, exit_code=%d)" % (repr(self.name), self.exit_code)
+
+    def __cmp__(self, other):
+        return cmp(self.exit_code,other.exit_code)

@@ -85,6 +85,8 @@ class Plugin(object):
 
     # TODO: Still missing version
 
+    responses = []
+
     def __init__(self, args=sys.argv):
         """
         Instantiates a plugin, setting up the options and arguments state.
@@ -155,3 +157,46 @@ class Plugin(object):
             status = WARNING
 
         return Response(status, message=message)
+
+    def add_response(self, response):
+        """
+        Add a Response object to be collated by all_responses
+        """
+        self.responses.append(response)
+
+    def all_responses(self, default=None):
+        """
+        Collate all Response objects added with add_response.  Return
+        a Response object with worst Status of the group and a message
+        consisting of the groups messages grouped and prefixed by their
+        status.
+
+        e.g. Response(worstStatus, "A, C WARN: K, L OK: X, Y, Z")
+
+        If no responses have been added, return the Response passed
+        in as default, or if default is None return pynagios.OK
+        """
+        if not self.responses:
+            if default:
+                return default
+            else:
+                return Response(OK)
+
+        self.responses.sort(reverse=True, key = lambda k: k.status)
+
+        worst = self.responses[0]
+        status = worst.status
+        message = worst.message
+
+        laststatus = status
+
+        for resp in self.responses[1:]:
+            if laststatus is not resp.status:
+                message += ' ' + resp.status.name + ': ' + resp.message
+                laststatus = resp.status
+            else:
+                message += ', ' + resp.message
+
+        return Response(status, message)
+
+        
