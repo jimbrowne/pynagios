@@ -5,6 +5,7 @@ encapsulates the response format that Nagios expects.
 
 import sys
 from perf_data import PerfData
+from collections import OrderedDict as odic
 
 class Response(object):
     """
@@ -30,7 +31,7 @@ class Response(object):
         """
         self.status = status
         self.message = message
-        self.perf_data = {}
+        self.perf_data = odic({})
 
     def set_perf_data(self, label, value, uom=None, warn=None, crit=None,
                       minval=None, maxval=None):
