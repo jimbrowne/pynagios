@@ -6,7 +6,7 @@ import sys
 import pytest
 import pynagios
 from optparse import OptionConflictError
-from pynagios import Plugin, Range, make_option
+from pynagios import Plugin, Range, Response, make_option
 
 class TestPlugin(object):
     Klass = Plugin
@@ -122,3 +122,30 @@ class TestPlugin(object):
         """
         plugin = self.Klass([])
         assert pynagios.OK == plugin.response_for_value(15).status
+
+    def test_multiple_responses_default(self):
+        """
+        Test that the default parameter to all_responses is working
+        """
+
+        plugin = self.Klass()
+        assert pynagios.OK == plugin.all_responses().status
+
+        r1 = Response(pynagios.UNKNOWN, 'default test')
+        assert r1.status == plugin.all_responses(r1).status
+        assert r1.message == plugin.all_responses(r1).message
+
+    def test_multiple_responses(self):
+        """
+        Test that the add_response and all_responses mechanism is working
+        """
+        plugin = self.Klass()
+        r1 = Response(pynagios.OK, 'foo')
+        r2 = Response(pynagios.CRITICAL, 'bar')
+        r3 = Response(pynagios.OK, 'baz')
+        plugin.add_response(r1)
+        plugin.add_response(r2)
+        plugin.add_response(r3)
+        assert pynagios.CRITICAL == plugin.all_responses().status
+        assert "bar OK: foo, baz" == plugin.all_responses().message
+
