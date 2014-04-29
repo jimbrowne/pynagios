@@ -2,11 +2,12 @@
 Contains tests to test the Plugin class.
 """
 
+from argparse import ArgumentError, ArgumentParser
 import sys
 import pytest
 import pynagios
 from optparse import OptionConflictError
-from pynagios import Plugin, Range, Response, make_option
+from pynagios import Plugin, Range, Response
 
 class TestPlugin(object):
     Klass = Plugin
@@ -26,9 +27,10 @@ class TestPlugin(object):
         """
         Tests that conflicting options will raise an exception.
         """
-        with pytest.raises(OptionConflictError):
+        with pytest.raises(ArgumentError):
             class MyChild(Plugin):
-                explode = make_option("-H", type="string")
+                parser = ArgumentParser(add_help=False)
+                parser.add_argument("-H", type=str)
 
     def test_plugin_parses_sys_argv(self, monkeypatch):
         """

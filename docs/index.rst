@@ -11,7 +11,7 @@ Overview
 
 **PyNagios** is a Python library for writing `Nagios <http://www.nagios.org/>`_
 plug-ins. Writing a Nagios plug-in typically involves conforming to a
-`large list of guidelines <http://nagiosplug.sourceforge.net/developer-guidelines.html>`_,
+`large list of guidelines <https://nagios-plugins.org/doc/guidelines.html>`_,
 and this library removes the boilerplate necessary in writing your own
 plug-ins.
 

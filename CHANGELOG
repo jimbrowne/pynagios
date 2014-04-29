@@ -1,4 +1,8 @@
-## 0.1.2 (unreleased)
+## 0.2.0 (unreleased)
+
+  - Upgraded to argparse since optparse is deprecated.
+
+## 0.1.2-dev
 
   - Default timeout to None. This allows the plugin to differentiate
     from a lack of a timeout given to a 0 timeout.
