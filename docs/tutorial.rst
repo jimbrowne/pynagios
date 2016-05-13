@@ -157,7 +157,7 @@ Custom Command-line Options and Arguments
 Often checks can require additional command line options. Since **PyNagios**
 plugins parse the command line on their own, you should define additional
 options on the plugin itself, rather than attempting to use your own command
-line parser. **PyNagios** uses Python's built-in ``optparse`` library.
+line parser. **PyNagios** uses Python's built-in ``argparse`` library.
 
 We'll extend our example to add an option to multiply the value by the
 given option value:::

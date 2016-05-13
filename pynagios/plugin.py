@@ -5,11 +5,13 @@ which should be subclassed when creating new plugins.
 """
 
 import sys
-from argparse import Action, ArgumentParser
+from argparse import Action, ArgumentParser, ArgumentError
 from copy import copy
-from range import Range, RangeValueError
-from response import Response
-from status import Status
+
+from six import with_metaclass
+from pynagios.range import Range, RangeValueError
+from pynagios.response import Response
+from pynagios.status import Status
 
 # Status constants which contain both the status text and the
 # exit status associated with them.
@@ -18,14 +20,16 @@ WARNING = Status("WARN", 1)
 CRITICAL = Status("CRIT", 2)
 UNKNOWN = Status("UNKNOWN", 3)
 
+
 def check_pynagios_range(value):
     """
     This parses and returns the Nagios range value.
     """
     try:
         return Range(value)
-    except RangeValueError, e:
+    except RangeValueError as e:
         raise ArgumentError("options %s: %s" % (opt, e.message))
+
 
 class PluginMeta(type):
     """
@@ -33,14 +37,13 @@ class PluginMeta(type):
     set up things such as command line arguments.
     """
 
-    def __new__(cls, name, bases, attrs):
-        attrs = attrs if attrs else {}
-
+    def __new__(cls, name, bases, attrs={}):
         # Set the parents on the plugin by finding all the parsers and
         # setting them.
         parents = []
+        attrs_copy = copy(attrs)
 
-        for key, val in attrs.items():
+        for key, val in attrs_copy.items():
             if isinstance(val, ArgumentParser):
                 # We set the destination of the Action to always be the
                 # attribute key...
@@ -64,14 +67,13 @@ class PluginMeta(type):
         # Create the class
         return super(PluginMeta, cls).__new__(cls, name, bases, attrs)
 
-class Plugin(object):
+
+class Plugin(with_metaclass(PluginMeta, object)):
     """
     Encapsulates a single plugin. This is able to parse the command line
     arguments, understands the range syntax, provides help output, and
     more.
     """
-    __metaclass__ = PluginMeta
-
     parser = ArgumentParser(add_help=False)
     parser.add_argument("-H", "--hostname", type=str)
     parser.add_argument("-w", "--warning", type=check_pynagios_range)
@@ -148,9 +150,11 @@ class Plugin(object):
         metrics, and return it.
         """
         status = OK
-        if hasattr(self.options, 'critical') and self.options.critical is not None and self.options.critical.in_range(value):
+        if hasattr(self.options, 'critical') and self.options.critical is not None and self.options.critical.in_range(
+                value):
             status = CRITICAL
-        elif hasattr(self.options, 'warning') and self.options.warning is not None and self.options.warning.in_range(value):
+        elif hasattr(self.options, 'warning') and self.options.warning is not None and self.options.warning.in_range(
+                value):
             status = WARNING
 
         return Response(status, message=message)
@@ -179,7 +183,7 @@ class Plugin(object):
             else:
                 return Response(OK)
 
-        self.responses.sort(reverse=True, key = lambda k: k.status)
+        self.responses.sort(reverse=True, key=lambda k: k.status)
 
         worst = self.responses[0]
         status = worst.status
@@ -195,5 +199,3 @@ class Plugin(object):
                 message += ', ' + resp.message
 
         return Response(status, message)
-
-        

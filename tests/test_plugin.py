@@ -6,7 +6,6 @@ from argparse import ArgumentError, ArgumentParser
 import sys
 import pytest
 import pynagios
-from optparse import OptionConflictError
 from pynagios import Plugin, Range, Response
 
 class TestPlugin(object):

@@ -4,8 +4,9 @@ encapsulates the response format that Nagios expects.
 """
 
 import sys
-from perf_data import PerfData
+from pynagios.perf_data import PerfData
 from collections import OrderedDict as odic
+
 
 class Response(object):
     """
@@ -55,7 +56,7 @@ class Response(object):
         This prints out the response to ``stdout`` and exits with the
         proper exit code.
         """
-        print(str(self))
+        print(str(self).encode('UTF-8'))
         sys.exit(self.status.exit_code)
 
     def __str__(self):
@@ -73,14 +74,15 @@ class Response(object):
 
           OK: 27 users logged in|users=27;0:40;0:60;0;
         """
-        result = "%s:" % self.status.name
+
+        result = u"%s:" % self.status.name
 
         if self.message is not None:
             result += " %s" % self.message
 
         if len(self.perf_data) > 0:
             # Attach the performance data to the result
-            data = [str(val) for key,val in self.perf_data.iteritems()]
+            data = [str(val) for key, val in self.perf_data.items()]
             result += '|%s' % (' '.join(data))
 
         return result

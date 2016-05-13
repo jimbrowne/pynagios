@@ -6,10 +6,10 @@ throughout the library.
 
 import argparse
 
-from plugin import Plugin, OK, WARNING, CRITICAL, UNKNOWN
-from range import Range
-from response import Response
-from status import Status
+from pynagios.plugin import Plugin, OK, WARNING, CRITICAL, UNKNOWN
+from pynagios.range import Range
+from pynagios.response import Response
+from pynagios.status import Status
 
 version = '0.1.2-dev'
 """Current version of PyNagios"""

@@ -6,7 +6,8 @@ called instead of having to create an entire :py:class:`PerfData` object.
 """
 
 import re
-from range import Range
+from pynagios.range import Range
+
 
 class PerfData(object):
     """
@@ -190,4 +191,3 @@ class PerfData(object):
             return "'%s'" % value.replace("'", "''")
         else:
             return value
-

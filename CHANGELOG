@@ -1,6 +1,7 @@
 ## 0.2.0 (unreleased)
 
   - Upgraded to argparse since optparse is deprecated.
+  - Support python3
 
 ## 0.1.2-dev
 

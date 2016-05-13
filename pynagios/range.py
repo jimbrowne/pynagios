@@ -3,6 +3,7 @@ Contains a class to represent a range that adheres to the range
 format defined by Nagios.
 """
 
+
 class RangeValueError(ValueError):
     """
     This exception is raised when an invalid value is passed to
@@ -10,6 +11,7 @@ class RangeValueError(ValueError):
     human readable explanation of the error.
     """
     pass
+
 
 class Range(object):
     """

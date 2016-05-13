@@ -2,13 +2,14 @@
 Contains tests for the pynagios.Response class.
 """
 
-import cStringIO
+from io import StringIO
+from io import BytesIO
 import sys
 import pynagios
 from pynagios import Response
 
-class TestResponse(object):
 
+class TestResponse(object):
     def test_status_gets_set_by_initializer(self):
         "Tests that the status can be set by the constructor."
         instance = Response(pynagios.OK)
@@ -50,15 +51,18 @@ class TestResponse(object):
 
     def test_exit(self, monkeypatch):
         """
-        Tests that responses exit with the proper exit code and
-        stdout output.
+        Tests that responses exit with the proper exit code and stdout output.
         """
+
         def mock_exit(code):
             mock_exit.exit_status = code
 
         mock_exit.exit_status = None
 
-        output = cStringIO.StringIO()
+        if sys.version_info[0] == 3:
+            output = StringIO()
+        else:
+            output = BytesIO()
         monkeypatch.setattr(sys, 'stdout', output)
         monkeypatch.setattr(sys, 'exit', mock_exit)
 
@@ -66,4 +70,4 @@ class TestResponse(object):
         instance.exit()
 
         assert pynagios.OK.exit_code == mock_exit.exit_status
-        assert "%s\n" % str(instance) == output.getvalue()
+        assert "%s\n" % str(instance).encode() == output.getvalue()
