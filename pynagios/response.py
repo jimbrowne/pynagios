@@ -56,7 +56,7 @@ class Response(object):
         This prints out the response to ``stdout`` and exits with the
         proper exit code.
         """
-        print(str(self).encode('UTF-8'))
+        print(str(self))
         sys.exit(self.status.exit_code)
 
     def __str__(self):
