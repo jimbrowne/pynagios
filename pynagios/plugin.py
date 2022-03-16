@@ -85,16 +85,14 @@ class Plugin(with_metaclass(PluginMeta, object)):
 
     responses = []
 
-    def __init__(self, args=sys.argv):
+    def __init__(self):
         """
         Instantiates a plugin, setting up the options and arguments state.
         Initialization by itself shouldn't do much, since the plugin should run
         when :py:func:`check` is called.
 
-        This init method will parse the arguments given in ``args`` and will
-        set the results on the ``options`` attribute. If no ``args`` are given,
-        the command line arguments given to the whole Python application will
-        be used.
+        This init method will parse the arguments given in sys.argv set the
+        results on the ``options`` attribute.
 
         All plugins parse standard command line arguments that are required
         by the Nagios developer guidelines:
@@ -122,8 +120,7 @@ class Plugin(with_metaclass(PluginMeta, object)):
         Instantiating the above plugin will result in the value of the new
         argument being available in ``options.your_name``.
         """
-        # Parse the given arguments to set the options
-        self.options = self._option_parser.parse_args(args)
+        self.options = self._option_parser.parse_args()
 
     def check(self):
         """

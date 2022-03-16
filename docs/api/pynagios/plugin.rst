@@ -3,7 +3,7 @@
 
 .. automodule:: pynagios.plugin
 
-   .. autoclass:: pynagios.plugin.Plugin([argv=sys.argv])
+   .. autoclass:: pynagios.plugin.Plugin()
 
       .. attribute:: options
 
@@ -11,12 +11,6 @@
          example, to get the ``hostname`` passed in via the command line:::
 
              options.hostname
-
-      .. attribute:: args
-
-         Array of additional positional arguments passed in via the command
-         line. For example, if you call the plugin with ``./plugin 1 2 3``,
-         then ``options.args`` will return ``[1,2,3]``.
 
       .. automethod:: check
       .. automethod:: response_for_value
