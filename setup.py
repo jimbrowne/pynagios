@@ -8,7 +8,7 @@ except:
 
 # Create the actual setup method
 setup(name='pynagios',
-      version='0.1.2-dev',
+      version='0.1.4-dev',
       description='Python library to write Nagios plugins.',
       long_description=readme_content,
       author='Mitchell Hashimoto',
